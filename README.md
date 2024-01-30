@@ -44,11 +44,24 @@ Virtual Environment will be used to keep track of dependencies, dependencies wil
 ``` Bash
 pip3 install virtualenv #This is for python 3 which all of us should have
 ```
+For Windows do the following
+``` Bash
+env_name\Scripts\activate
+```
 Next we will name the virtual Environment whatever we want to call it this is not important though
 
 ``` Bash
 virtualenv env_name  # Replace 'env_name' with your desired environment name
 ```
+
+## Cloning the project 
+Here you will clone the github repository the prerequisite to this is to already be in your desired folder with the virtual machine up and running 
+``` Bash
+git clone https://github.com/JorgeG2/Software_Engineering
+```
+
+
+
 
 
 
