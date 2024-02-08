@@ -37,6 +37,12 @@ Additional tools and libraries will be chosen based on project requirements.
 
 **Dylan**: Manages security and data protection, ensuring the system is robust against potential threats. Also works on optimizing server performance.
 
+## Cloning the project 
+Here you will clone the github repository 
+``` Bash
+git clone https://github.com/JorgeG2/Software_Engineering
+```
+
 ## How to start working on the Project
 Virtual Environment will be used to keep track of dependencies, dependencies will be things like frameworks, libraries, versions of programming languages this will be important because when we want to upload our project to a server using either Digital Ocean, Heroku, AWS the server needs to know exactly what we are running so that it can host the site correctly
 
@@ -54,11 +60,7 @@ Next we will name the virtual Environment whatever we want to call it this is no
 virtualenv env_name  # Replace 'env_name' with your desired environment name
 ```
 
-## Cloning the project 
-Here you will clone the github repository the prerequisite to this is to already be in your desired folder with the virtual machine up and running 
-``` Bash
-git clone https://github.com/JorgeG2/Software_Engineering
-```
+
 
 
 
