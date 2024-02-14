@@ -13,3 +13,19 @@ reflects the intended data model. Familiarity with SQL will still be beneficial,
 operates, providing a solid foundation for understanding and optimizing database interactions.
 """
 # Rest of the code follows, defining tables and their relationships...
+
+
+#First we start of creating a user object which will contain Name, Username ,Email, Password and Profile Picture
+
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    username = db.Column(db.String(20), unique=True, nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(60), nullable=False)
+    image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
+    posts = db.relationship('Post', backref='author', lazy=True)
+
+
+    #
+
