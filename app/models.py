@@ -14,6 +14,17 @@ operates, providing a solid foundation for understanding and optimizing database
 """
 # Rest of the code follows, defining tables and their relationships...
 
+from datetime import datetime
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
+from sqlalchemy import ForeignKey
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Manchester10!@localhost/GSG'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
 
 #First we start of creating a user object which will contain Name, Username ,Email, Password and Profile Picture
 
@@ -27,5 +38,9 @@ class User(UserMixin, db.Model):
     posts = db.relationship('Post', backref='author', lazy=True)
 
 
-    #
-
+class Message(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    content = db.Column(db.String)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
