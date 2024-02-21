@@ -7,3 +7,36 @@ For each route (URL path), we define a function that creates the page the user s
 These functions can pull information from our database, use it to fill out templates, or accept 
 user input to create new records in our database.
 """
+from flask import Flask, render_template, request, redirect, url_for, flash
+from models import User
+from datetime import datetime
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
+from sqlalchemy import ForeignKey
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Manchester10!@localhost/GSG'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        # Check if email already exists
+        user = User.query.filter_by(email=email).first()
+        if user:
+            flash('Email already exists.')
+            return redirect(url_for('register'))
+        # Assign password directly without hashing
+        new_user = User(name=name, username=username, email=email, password=password)
+        db.session.add(new_user)
+        db.session.commit()
+        # Redirect or log in the user
+        return redirect(url_for('login'))
+    return render_template('register.html')
