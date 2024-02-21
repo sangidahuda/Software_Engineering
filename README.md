@@ -17,9 +17,9 @@ Our team is made up of individuals with different skills and roles. From those w
 ## Technology Stack
 We will utilize a combination of modern programming languages, frameworks, and libraries. This includes:
 
-**Frontend**: HTML, CSS, JavaScript, Bootstrap (React.js for dynamic user interfaces)
+**Frontend**: HTML, CSS, JavaScript, Bootstrap 
 
-**Backend**: Python (Django or Flask for robust backend services)
+**Backend**: Python (Flask for robust backend services)
 
 **Database**: SQL (PostgreSQL or MySQL for data management)
 Additional tools and libraries will be chosen based on project requirements.
@@ -37,10 +37,13 @@ Additional tools and libraries will be chosen based on project requirements.
 
 **Dylan**: Manages security and data protection, ensuring the system is robust against potential threats. Also works on optimizing server performance.
 
+## Fork this project
+first you must fork the project once you fork go to terminal
+
 ## Cloning the project 
-Here you will clone the github repository 
+Here you will clone the github fork you just got using your link  
 ``` Bash
-git clone https://github.com/JorgeG2/Software_Engineering
+git clone https://github.com/TheirUsername/Software_Engineering.git
 ```
 
 ## How to start working on the Project
@@ -59,7 +62,11 @@ Next we will name the virtual Environment whatever we want to call it this is no
 ``` Bash
 virtualenv env_name  # Replace 'env_name' with your desired environment name
 ```
-
+## installing dependencies 
+Finally once you finish everything else we must download dependencies (like flask, WTF Froms etc)
+``` Bash
+pip install -r requirements.txt
+```
 
 
 
