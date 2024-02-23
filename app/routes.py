@@ -40,3 +40,19 @@ def register():
         # Redirect or log in the user
         return redirect(url_for('login'))
     return render_template('register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        # Check if email and password match the database entry
+        user = User.query.filter_by(email=email).first()
+        if user and user.password == password:
+            # For the demo, we'll just redirect to a dummy home page on successful login
+            return redirect(url_for('home'))
+        else:
+            flash('Login Unsuccessful. Please check email and password')
+            return redirect(url_for('login'))
+    return render_template('login.html')
