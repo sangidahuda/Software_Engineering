@@ -13,11 +13,11 @@ from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from sqlalchemy import ForeignKey
+from app import db
+
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Manchester10!@localhost/GSG'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
+
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -40,6 +40,8 @@ def register():
         # Redirect or log in the user
         return redirect(url_for('login'))
     return render_template('register.html')
+
+# Work from Dyland
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
