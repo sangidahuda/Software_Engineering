@@ -58,3 +58,30 @@ def login():
             flash('Login Unsuccessful. Please check email and password')
             return redirect(url_for('login'))
     return render_template('login.html')
+
+
+# @app.route('/send_message', methods=['POST'])
+# def send_message():
+#    if request.method == 'POST':
+#        sender_id = request.form.get('sender_id')
+#       recipient_id = request.form.get('recipient_id')
+#        content = request.form.get('content')
+        
+        # Create a new message instance
+#        new_message = Message(sender_id=sender_id, recipient_id=recipient_id, content=content)
+#        db.session.add(new_message)
+#        db.session.commit()
+        
+#        flash('Message sent successfully!')
+#        return redirect(url_for('home'))  # Adjust the redirect as needed
+#    else:
+        # Optionally handle GET request or redirect
+#        return redirect(url_for('send_message_form'))
+
+#@app.route('/view_messages/<int:user_id>')
+#def view_messages(user_id):
+    # Assuming 'user_id' is the ID of the recipient
+ #   received_messages = Message.query.filter_by(recipient_id=user_id).order_by(Message.created_at.desc()).all()
+ #   return render_template('view_messages.html', messages=received_messages)
+
+
