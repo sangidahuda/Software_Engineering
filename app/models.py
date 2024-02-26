@@ -12,33 +12,48 @@ foreign keys. This setup is directly influenced by our ER diagram, ensuring our 
 reflects the intended data model. Familiarity with SQL will still be beneficial, as it underpins how SQLAlchemy 
 operates, providing a solid foundation for understanding and optimizing database interactions.
 """
-# Rest of the code follows, defining tables and their relationships...
+# models.py
 from datetime import datetime
-from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
-from sqlalchemy import ForeignKey
+from werkzeug.security import generate_password_hash, check_password_hash
 from app import db
 
-
-
-#First we start of creating a user object which will contain Name, Username ,Email, Password and Profile Picture
-#already in sql alchemy we have a UserMixin class which contains all the basic methods for user management
+# Define the User model, inheriting from UserMixin for Flask-Login integration
 class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    username = db.Column(db.String(20), unique=True, nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    password = db.Column(db.String(60), nullable=False)
-    image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
-#    posts = db.relationship('Post', backref='author', lazy=True)
+    # User's database table columns
+    id = db.Column(db.Integer, primary_key=True)  # Unique identifier for each user
+    name = db.Column(db.String(100), nullable=False)  # User's name
+    email = db.Column(db.String(100), unique=True, nullable=False)  # User's email, must be unique
+    password = db.Column(db.String(200), nullable=False)  # Hashed password
+    is_admin = db.Column(db.Boolean, default=False)  # Flag to identify admin users
 
+    # Relationship to messages sent by this user
+    messages_sent = db.relationship('Message', foreign_keys='Message.sender_id', backref='sender', lazy='dynamic')
+    # Relationship to messages received by this user
+    messages_received = db.relationship('Message', foreign_keys='Message.recipient_id', backref='recipient', lazy='dynamic')
+
+    def set_password(self, password):
+        """Create hashed password."""
+        self.password = generate_password_hash(password)
+
+    def check_password(self, password):
+        """Check hashed password."""
+        return check_password_hash(self.password, password)
+
+# Define the Message model
 class Message(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    sender_id = db.Column(db.Integer, ForeignKey('user.id'))
-    recipient_id = db.Column(db.Integer, ForeignKey('user.id'))
-    content = db.Column(db.String)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    # Message's database table columns
+    id = db.Column(db.Integer, primary_key=True)  # Unique identifier for each message
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # User ID of the message sender
+    recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # User ID of the message recipient
+    content = db.Column(db.String(1000), nullable=False)  # Content of the message
+    created_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)  # Timestamp of when the message was sent
+    read = db.Column(db.Boolean, default=False)  # Flag to track if the message has been read
+
+# Note: Ensure you have imported db from your Flask app instance, usually defined in your app's __init__.py file:
+# from app import db
+
 
 class Property(db.Model):
     id = db.Column(db.Integer, primary_key=True)
