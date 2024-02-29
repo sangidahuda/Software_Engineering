@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Send a Message to Owner</title>
+  </head>
+  <body>
+    <h2>Send a Message to Owner</h2>
+    <form id="messageForm">
+      <textarea
+        id="messageContent"
+        placeholder="Type your message here..."
+        required
+      ></textarea
+      ><br />
+      <button type="submit">Send Message</button>
+    </form>
+    <div id="messagesDisplay">
+      <!-- Messages will be displayed here -->
+    </div>
+
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script type="text/javascript">
+      // Assign the current_user.id to a JavaScript variable
+      var currentUserId = {{ current_user.id | tojson }};
+    </script>
+
+    <script>
+      $(document).ready(function () {
+        function fetchConversation() {
+          $.ajax({
+            url: "{{ url_for('main.get_my_conversation_with_owner') }}",
+            type: "GET",
+            success: function (response) {
+              var messages = response.messages;
+              $("#messagesDisplay").empty();
+              $.each(messages, function (index, message) {
+                var messageElement = $("<div>").text(
+                  (message.sender_id == currentUserId ? "You: " : "Owner: ") +
+                    message.content +
+                    " (Sent at " +
+                    message.timestamp +
+                    ")"
+                );
+                $("#messagesDisplay").append(messageElement);
+              });
+            },
+            error: function (error) {
+              console.log("Error fetching conversation:", error);
+            },
+          });
+        }
+
+        $("#messageForm").submit(function (event) {
+          event.preventDefault();
+          var messageContent = $("#messageContent").val();
+
+          $.ajax({
+            url: "{{ url_for('main.send_message') }}",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ content: messageContent }),
+            dataType: "json",
+            success: function (response) {
+              fetchConversation();
+              $("#messageContent").val("");
+            },
+            error: function (error) {
+              console.log(error);
+            },
+          });
+        });
+
+        // Call fetchConversation on page load
+        fetchConversation();
+      });
+    </script>
+  </body>
+</html>

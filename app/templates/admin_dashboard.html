@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Admin Dashboard</title>
+    <!-- Include any additional CSS files here -->
+  </head>
+  <body>
+    <h2>Admin Dashboard</h2>
+    <ul id="userList">
+      <!-- User list will be populated here via JavaScript -->
+    </ul>
+
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+      $(document).ready(function () {
+        function fetchUserList() {
+          $.ajax({
+            url: "{{ url_for('main.get_user_list') }}",
+            type: "GET",
+            success: function (response) {
+              var userList = $("#userList");
+              userList.empty(); // Clear existing list
+              response.user_list.forEach(function (user) {
+                var listItem = $("<li>").text(user.name);
+                listItem.on("click", function () {
+                  // Redirect to user-specific conversation page
+                  window.location.href = "/admin_messages/" + user.sender_id;
+                });
+                userList.append(listItem);
+              });
+            },
+            error: function (error) {
+              console.log("Error fetching user list:", error);
+            },
+          });
+        }
+
+        // Call fetchUserList to populate the list on page load
+        fetchUserList();
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Chat with {{ user.name }}</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <body>
+    <h2>Chat with {{ user.name }}</h2>
+    <div id="messageList">
+      {% for message in messages %}
+      <p>
+        <strong
+          >{{ 'You' if message.sender_id == current_user.id else user.name
+          }}:</strong
+        >
+        {{ message.content }}
+      </p>
+      {% endfor %}
+    </div>
+    <form id="sendMessageForm">
+      <input type="text" id="messageContent" placeholder="Type a message..." />
+      <button type="submit">Send</button>
+    </form>
+
+    <script>
+      $(document).ready(function () {
+        $("#sendMessageForm").submit(function (e) {
+          e.preventDefault();
+          const messageContent = $("#messageContent").val();
+          $.ajax({
+            url: "/send_message_to_user/{{ user.id }}",
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ content: messageContent }),
+            success: function (response) {
+              $("#messageList").append(
+                `<p><strong>You:</strong> ${messageContent}</p>`
+              );
+              $("#messageContent").val("");
+            },
+            error: function () {
+              alert("Message sending failed.");
+            },
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
