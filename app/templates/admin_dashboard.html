@@ -29,7 +29,7 @@
                   // Redirect to user-specific conversation page
                   window.location.href = "/admin_messages/" + user.sender_id;
                 });
-                userList.append(listItem);
+                userList.prepend(listItem);
               });
             },
             error: function (error) {

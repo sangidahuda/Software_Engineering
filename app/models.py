@@ -4,6 +4,7 @@ from .extensions import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
+# Working on the User model and message for clients
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -24,3 +25,35 @@ class Message(db.Model):
     content = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     read = db.Column(db.Boolean, default=False)
+
+
+# Working on the PropertyListing model and reservation for clients 
+class PropertyListing(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    price = db.Column(db.Integer, nullable=False)
+    location = db.Column(db.String(100), nullable=False)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+
+    photos = db.relationship('Photos', backref='property_listing')
+
+class Photos(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    photo = db.Column(db.String(100), nullable=False)
+    property_id = db.Column(db.Integer, db.ForeignKey('property_listing.id'), nullable=False)
+
+class Reservation(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    property_id = db.Column(db.Integer, db.ForeignKey('property_listing.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # Foreign key to the User model
+    start_date = db.Column(db.DateTime, nullable=False)
+    end_date = db.Column(db.DateTime, nullable=False)
+    status = db.Column(db.String(100), nullable=False)  # e.g., "confirmed", "cancelled"
+
+    # Define the relationship to User
+    user = db.relationship('User', backref='reservations')
+    # Continue with your existing relationship to PropertyListing
+    property = db.relationship('PropertyListing', backref='reservations')
+
+
