@@ -143,6 +143,10 @@ def send_message_to_user(user_id):
 
     return jsonify({'message': 'Message sent successfully'})
 
+#################################################################### for creating a new property listing
+
+
+
 @main_bp.route('/index')
 def index():
     return render_template('index.html')
