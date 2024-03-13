@@ -43,6 +43,7 @@ class Photos(db.Model):
     photo = db.Column(db.String(100), nullable=False)
     property_id = db.Column(db.Integer, db.ForeignKey('property_listing.id'), nullable=False)
 
+# will be the last part of the reservation confirm 
 class Reservation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     property_id = db.Column(db.Integer, db.ForeignKey('property_listing.id'), nullable=False)

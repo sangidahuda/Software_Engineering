@@ -14,6 +14,17 @@
     <!-- Include jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+    <div id="propertyList">
+
+      <form action="{{ url_for('create_property_listing') }}" method="post">
+        <input type="text" name="Title" placeholder="Name" required /><br />
+        <input type="text" name="description" placeholder="Description" required /><br />
+        <input type="text" name="price" placeholder="Price" required /><br />
+        <input type="text" name="location" placeholder="Location" required /><br />
+        <input type="text" name="image" placeholder="Image" required /><br />
+        <button type="submit">Create Listing</button>
+    </div>
+    <!-- script that get and populates the list of the clients who have sent a message -->
     <script>
       $(document).ready(function () {
         function fetchUserList() {

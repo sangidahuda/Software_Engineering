@@ -1,7 +1,7 @@
 # app/routes.py
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from .extensions import db
-from .models import User, Message
+from .models import User, Message,PropertyListing
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, current_user
 from flask import jsonify
@@ -145,6 +145,29 @@ def send_message_to_user(user_id):
 
 #################################################################### for creating a new property listing
 
+@main_bp.route('/create_property_listing', methods=['POST'])
+@login_required
+def create_property_listing():
+    #use request.form to access form data
+    title = request.form.get('title')
+    description = request.form.get('description')
+    price = request.form.get('price')
+    location = request.form.get('location')
+
+    # Convert price to an integer
+    try:
+        price = int(price)
+    except ValueError:
+        flash('Price must be a number.')
+        return redirect(url_for('main.admin_dashboard.'))
+    
+    new_property = PropertyListing(title=title, description=description, price=price, location=location)
+   
+    db.session.add(new_property)
+    db.session.commit()
+
+    flash('Property listing created successfully.')
+    return redirect(url_for('main.admin_dashboard'))
 
 
 @main_bp.route('/index')
