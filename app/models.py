@@ -35,12 +35,13 @@ class PropertyListing(db.Model):
     price = db.Column(db.Integer, nullable=False)
     location = db.Column(db.String(100), nullable=False)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    # user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # Add this line
 
     photos = db.relationship('Photos', backref='property_listing')
 
 class Photos(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    photo = db.Column(db.String(100), nullable=False)
+    photo = db.Column(db.String(255), nullable=False)
     property_id = db.Column(db.Integer, db.ForeignKey('property_listing.id'), nullable=False)
 
 # will be the last part of the reservation confirm 
