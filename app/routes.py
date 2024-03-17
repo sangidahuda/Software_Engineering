@@ -148,117 +148,6 @@ def send_message_to_user(user_id):
 
 #################################################################### for creating a new property listing
 
-# @main_bp.route('/create_property_listing', methods=['POST'])
-# @login_required
-# def create_property_listing():
-#     #use request.form to access form data
-#     title = request.form.get('title')
-#     description = request.form.get('description')
-#     price = request.form.get('price')
-#     location = request.form.get('location')
-#     user_id = 1
-
-#     # Convert price to an integer
-#     try:
-#         price = int(price)
-#     except ValueError:
-#         flash('Price must be a number.')
-#         return redirect(url_for('main.admin_dashboard.'))
-    
-#     new_property = PropertyListing(title=title, description=description, price=price, location=location)
-   
-#     db.session.add(new_property)
-#     db.session.commit()
-
-#     flash('Property listing created successfully.')
-#     return redirect(url_for('main.admin_dashboard'))
-###############################################################################################
-# ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
-# def allowed_file(filename):
-#     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-# @main_bp.route('/create_property_listing', methods=['POST'])
-# @login_required
-# def create_property_listing():
-#     if 'image' not in request.files:
-#         flash('No image part')
-#         return redirect(request.url)
-#     image = request.files['image']
-#     if image.filename == '':
-#         flash('No image selected for uploading')
-#         return redirect(request.url)
-    
-#     # Validate and save the image
-#     if image and allowed_file(image.filename):
-#         filename = secure_filename(image.filename)
-#         image_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-#         image.save(image_path)
-#     else:
-#         flash('Allowed image types are -> jpg, jpeg, png')
-#         return redirect(request.url)
-
-#     title = request.form.get('title')
-#     description = request.form.get('description')
-#     price = request.form.get('price')
-#     location = request.form.get('location')
-
-#     # Convert price to an integer
-#     try:
-#         price = int(price)
-#     except ValueError:
-#         flash('Price must be a number.')
-#         return redirect(url_for('main.admin_dashboard'))
-    
-#     # Save the new property listing with the image
-#     new_property = PropertyListing(title=title, description=description, price=price, location=location)
-#     db.session.add(new_property)
-#     db.session.commit()
-
-#     flash('Property listing created successfully.')
-#     return redirect(url_for('main.admin_dashboard'))
-#######################################################################
-# ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
-
-# def allowed_file(filename):
-#     return '.' in filename and \
-#            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
-# @main_bp.route('/create_property_listing', methods=['POST'])
-# @login_required
-# def create_property_listing():
-#     title = request.form.get('title')
-#     description = request.form.get('description')
-#     price = request.form.get('price')
-#     location = request.form.get('location')
-
-#     try:
-#         price = int(price)
-#     except ValueError:
-#         flash('Price must be a number.')
-#         return redirect(url_for('main.admin_dashboard'))
-    
-#     # Create the new property listing
-#     new_property = PropertyListing(title=title, description=description, price=price, location=location)
-#     db.session.add(new_property)
-    
-#     images = request.files.getlist('images')
-#     for image in images:
-#         if image and allowed_file(image.filename):
-#             filename = secure_filename(image.filename)
-#             image_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-#             image.save(image_path)
-#             # Create a new Photo instance for each image
-#             new_photo = Photos(photo=filename, property=new_property)
-#             db.session.add(new_photo)
-#         else:
-#             flash('Some images were not saved. Allowed image types are -> jpg, jpeg, png')
-    
-#     db.session.commit()
-
-#     flash('Property listing and associated images uploaded successfully.')
-#     return redirect(url_for('main.admin_dashboard'))
-
 # Helper function to check allowed file extensions
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
 def allowed_file(filename):
@@ -268,17 +157,19 @@ def allowed_file(filename):
 @login_required
 def create_property_listing():
     if request.method == 'POST':
+        # Check if the post request has the file part
         if 'images' not in request.files:
             flash('No images part')
             return redirect(request.url)
         
         images = request.files.getlist('images')
-        
+        # in this if block we are checking if the file is present or not.
         if not images or any(image.filename == '' for image in images):
             flash('No image selected for uploading')
             return redirect(request.url)
-        
+        # array to store the uploaded filenames
         uploaded_filenames = []
+        # Save the uploaded images
         for image in images:
             if image and allowed_file(image.filename):
                 filename = secure_filename(image.filename)
@@ -289,6 +180,10 @@ def create_property_listing():
                 flash('Allowed image types are -> jpg, jpeg, png')
                 return redirect(request.url)
         
+        ############
+        bedrooms = request.form.get('bedrooms')
+        bathrooms = request.form.get('bathrooms')
+        ##########
         # Form data
         title = request.form.get('title')
         description = request.form.get('description')
@@ -302,7 +197,14 @@ def create_property_listing():
             flash('Price must be a number.')
             return redirect(url_for('main.admin_dashboard'))
         
-        new_property = PropertyListing(title=title, description=description, price=price, location=location)
+        try:
+           bedrooms = int(request.form.get('bedrooms'))
+           bathrooms = int(request.form.get('bathrooms'))
+        except ValueError:
+            flash('Bedrooms and Bathrooms must be numbers.')
+            return redirect(url_for('main.admin_dashboard'))
+        
+        new_property = PropertyListing(title=title, description=description, price=price, location=location, bedrooms=bedrooms, bathrooms=bathrooms )
         db.session.add(new_property)
         db.session.flush()  # This is used to get the id of the new_property before committing
 
