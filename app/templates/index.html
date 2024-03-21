@@ -1,11 +1,53 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>My Website</title>
-  </head>
-  <body>
-    <h1>Welcome to My Website</h1>
-    <p>This is the content of my website.</p>
-    <!-- will add the info for the bookings available -->
-  </body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Property Listings</title>
+    <!-- Include your CSS files here -->
+</head>
+<body>
+    <h1>Property Listings</h1>
+    <div id="propertyList">
+        <!-- The property listings will be inserted here by JavaScript -->
+    </div>
+
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        function fetchPropertyListings() {
+          $.ajax({
+            url: "{{ url_for('main.get_property_listings') }}",
+            type: "GET",
+            success: function (properties) {
+              var propertyList = $("#propertyList");
+              propertyList.empty(); // Clear any existing content
+              properties.forEach(function (property) {
+                // Create a clickable div element for each property
+                var listing = $('<div class="property-item" style="cursor: pointer;">');
+                listing.append($('<h2>').text(property.title));
+                listing.append($('<p>').text(property.description));
+                listing.append($('<p>').text('Bedrooms: ' + property.bedrooms));
+                listing.append($('<p>').text('Bathrooms: ' + property.bathrooms));
+                listing.append($('<p>').text('Price: $' + property.price));
+                listing.append($('<p>').text('Location: ' + property.location));
+                // Redirect to the property detail page on click
+                listing.on('click', function () {
+                  window.location.href = "/property/" + property.id;
+                });
+                propertyList.append(listing);
+              });
+            },
+            error: function (error) {
+              console.log("Error fetching property listings:", error);
+            }
+          });
+        }
+    
+        // Load property listings on page load
+        fetchPropertyListings();
+      });
+    </script>
+    
+</body>
 </html>

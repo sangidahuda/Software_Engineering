@@ -180,11 +180,9 @@ def create_property_listing():
                 flash('Allowed image types are -> jpg, jpeg, png')
                 return redirect(request.url)
         
-        ############
+        # Form data
         bedrooms = request.form.get('bedrooms')
         bathrooms = request.form.get('bathrooms')
-        ##########
-        # Form data
         title = request.form.get('title')
         description = request.form.get('description')
         price = request.form.get('price')
@@ -217,11 +215,36 @@ def create_property_listing():
         flash('Property listing created successfully.')
         
         return redirect(url_for('main.admin_dashboard'))
-#######################################################################
+####################################################################### for viewing property listings
+@main_bp.route('/get_property_listings')
+def get_property_listings():
+    property_listings = PropertyListing.query.all()  # Fetch all property listings from the database
+    properties = []
+    for property in property_listings:
+        properties.append({
+            'id': property.id,
+            'title': property.title,
+            'description': property.description,
+            'price': property.price,
+            'location': property.location,
+            'bedrooms': property.bedrooms,
+            'bathrooms': property.bathrooms
+        })
+    return jsonify(properties)  # Convert the list of property data into JSON and return it
+########################################################################## sends to property.html
+@main_bp.route('/property/<int:property_id>')
+def property_detail(property_id):
+    property = PropertyListing.query.get_or_404(property_id)
+    # The function 'render_template' will pass the 'property' object to 'property.html'
+    return render_template('property.html', property=property)
+
+
 
 @main_bp.route('/index')
 def index():
     return render_template('index.html')
+
+
 
 @main_bp.route('/user_messages')
 @login_required
