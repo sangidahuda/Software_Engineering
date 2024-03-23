@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <title>Chat with {{ user.name }}</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='Amessages.css') }}"
+  />
   </head>
   <body>
     <h2>Chat with {{ user.name }}</h2>
