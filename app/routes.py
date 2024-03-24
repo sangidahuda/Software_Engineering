@@ -217,6 +217,8 @@ def create_property_listing():
 @main_bp.route('/get_property_listings')
 def get_property_listings():
     property_listings = PropertyListing.query.all()  
+    properties = []  
+
     for property in property_listings:
         properties.append({
             'id': property.id,
