@@ -1,13 +1,16 @@
 # app/routes.py
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify,current_app
 from .extensions import db
-from .models import User, Message,PropertyListing, Photos
+from .models import User, Message,PropertyListing, Photos, Reservation
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from flask_login import login_user, login_required, current_user
 from flask import jsonify
 from sqlalchemy import func, case
 import os
+from datetime import datetime, timedelta
+from sqlalchemy.exc import IntegrityError
+
 
 
 main_bp = Blueprint('main', __name__)
@@ -21,13 +24,13 @@ def register():
         email = request.form.get('email')
         password = request.form.get('password')
         
-        # Check if user already exists
+        # Checks if user already exists
         user = User.query.filter_by(email=email).first()
         if user:
             flash('Email already registered.')
             return redirect(url_for('main.register'))
         
-        # Create new user with hashed password
+        # Creates new user with hashed password
         hashed_password = generate_password_hash(password)
         new_user = User(name=name, email=email, password_hash=hashed_password)
         db.session.add(new_user)
@@ -55,7 +58,7 @@ def login():
             else:  # This else should align with if user.is_admin
                 return redirect(url_for('main.user_messages'))
         else:
-            flash('Invalid email or password.')  # Provide feedback for failed login
+            flash('Invalid email or password.')  
 
     return render_template('login.html')
 
@@ -66,8 +69,6 @@ def login():
 def send_message():
   data = request.get_json()
   content = data.get('content')
-  # Assuming the recipient_id for the owner/admin is known, e.g., 1
-  # and 'current_user' is the sender who is logged in
   new_message = Message(sender_id=current_user.id, recipient_id=1, content=content)
 
   # Save the new message to the database
@@ -79,7 +80,6 @@ def send_message():
 @main_bp.route('/get_my_conversation_with_owner')
 @login_required
 def get_my_conversation_with_owner():
-    # Fetch messages where the current user is either the sender or recipient
     messages = Message.query.filter(
         (Message.sender_id == current_user.id) | 
         (Message.recipient_id == current_user.id)
@@ -100,6 +100,7 @@ def get_my_conversation_with_owner():
 
 
 # Here is the code for the admin route.###################################################
+
 @main_bp.route('/get_user_list')
 @login_required
 def get_user_list():
@@ -118,6 +119,7 @@ def get_user_list():
     return jsonify({'user_list': user_list})
 
 #################################################################### for viewing client messages
+
 @main_bp.route('/admin_messages/<int:user_id>')
 @login_required
 def admin_messages(user_id):
@@ -133,6 +135,7 @@ def admin_messages(user_id):
     return render_template('admin_messages.html', user=user, messages=messages)
 
 #################################################################### for sending client messages
+
 @main_bp.route('/send_message_to_user/<int:user_id>', methods=['POST'])
 @login_required
 def send_message_to_user(user_id):
@@ -148,7 +151,6 @@ def send_message_to_user(user_id):
 
 #################################################################### for creating a new property listing
 
-# Helper function to check allowed file extensions
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -167,9 +169,7 @@ def create_property_listing():
         if not images or any(image.filename == '' for image in images):
             flash('No image selected for uploading')
             return redirect(request.url)
-        # array to store the uploaded filenames
         uploaded_filenames = []
-        # Save the uploaded images
         for image in images:
             if image and allowed_file(image.filename):
                 filename = secure_filename(image.filename)
@@ -180,7 +180,6 @@ def create_property_listing():
                 flash('Allowed image types are -> jpg, jpeg, png')
                 return redirect(request.url)
         
-        # Form data
         bedrooms = request.form.get('bedrooms')
         bathrooms = request.form.get('bathrooms')
         title = request.form.get('title')
@@ -188,7 +187,7 @@ def create_property_listing():
         price = request.form.get('price')
         location = request.form.get('location')
         
-        # Save the new property listing
+        # Saves the new property listing
         try:
             price = int(price)
         except ValueError:
@@ -204,9 +203,8 @@ def create_property_listing():
         
         new_property = PropertyListing(title=title, description=description, price=price, location=location, bedrooms=bedrooms, bathrooms=bathrooms )
         db.session.add(new_property)
-        db.session.flush()  # This is used to get the id of the new_property before committing
+        db.session.flush()  
 
-        # Associate uploaded images with this property
         for filename in uploaded_filenames:
             new_photo = Photos(photo=filename, property_id=new_property.id)
             db.session.add(new_photo)
@@ -218,8 +216,7 @@ def create_property_listing():
 ####################################################################### for viewing property listings
 @main_bp.route('/get_property_listings')
 def get_property_listings():
-    property_listings = PropertyListing.query.all()  # Fetch all property listings from the database
-    properties = []
+    property_listings = PropertyListing.query.all()  
     for property in property_listings:
         properties.append({
             'id': property.id,
@@ -230,12 +227,75 @@ def get_property_listings():
             'bedrooms': property.bedrooms,
             'bathrooms': property.bathrooms
         })
-    return jsonify(properties)  # Convert the list of property data into JSON and return it
-########################################################################## sends to property.html
+    return jsonify(properties)  
+######################################################################### Creates a reservation
+@main_bp.route('/create_reservation/<int:property_id>', methods=['POST'])
+@login_required
+def create_reservation(property_id):
+    try:
+        start_date = datetime.strptime(request.form.get('start_date'), '%Y-%m-%d')
+        end_date = datetime.strptime(request.form.get('end_date'), '%Y-%m-%d')
+    except ValueError:
+        flash('Invalid date format. Please use YYYY-MM-DD.')
+        return redirect(url_for('main.property_detail', property_id=property_id))
+
+    if start_date < datetime.today() or end_date < datetime.today():
+        flash('Cannot select dates in the past.')
+        return redirect(url_for('main.property_detail', property_id=property_id))
+    
+    # Calculate the number of days of the reservation
+    delta = end_date - start_date
+    reservation_days = delta.days + 1  # Includes both the check-in and check-out days
+
+    # gets the property to calculate the total cost
+    property = PropertyListing.query.get_or_404(property_id)
+    base_price = property.price
+
+    # Checks for advance booking discount (6 months ahead)
+    six_months_from_now = datetime.today() + timedelta(days=30*6)
+    discount = 0
+    if start_date >= six_months_from_now:
+        discount = 0.1  # 10% discount for bookings made at least 6 months in advance
+
+    # Calculate total price before discount
+    total_price_before_discount = base_price * reservation_days
+
+    # Apply discount if any
+    discounted_total_price = total_price_before_discount - (total_price_before_discount * discount)
+
+    new_reservation = Reservation(
+        property_id=property_id,
+        user_id=current_user.id,
+        start_date=start_date,
+        end_date=end_date,
+        status='pending',
+        total=discounted_total_price  # This is the total price after discount if any
+    )
+    db.session.add(new_reservation)
+
+    try:
+        db.session.commit()
+        flash_message = f'Your reservation has been made successfully! Total cost: ${discounted_total_price:.2f}'
+        if discount > 0:
+            flash_message += f' (including a {discount*100}% discount for booking 6 months in advance.)'
+        flash(flash_message)
+    except IntegrityError:
+        db.session.rollback()
+        flash('An error occurred. Please try again.')
+
+    return redirect(url_for('main.property_detail', property_id=property_id))
+
+
+
+
+
+
+
+
+
 @main_bp.route('/property/<int:property_id>')
 def property_detail(property_id):
     property = PropertyListing.query.get_or_404(property_id)
-    # The function 'render_template' will pass the 'property' object to 'property.html'
     return render_template('property.html', property=property)
 
 
@@ -251,7 +311,7 @@ def index():
 def user_messages():
     # Ensure only non-admin users can access this page
     if current_user.is_admin:
-        return redirect(url_for('main.index'))  # or some other appropriate action
+        return redirect(url_for('main.index'))  
     return render_template('user_messages.html')
 
 @main_bp.route('/admin_dashboard')
@@ -259,7 +319,7 @@ def user_messages():
 def admin_dashboard():
     # Ensure only admin users can access this page
     if not current_user.is_admin:
-        return redirect(url_for('main.index'))  # or some appropriate action
+        return redirect(url_for('main.index'))  
     return render_template('admin_dashboard.html')
 
 
