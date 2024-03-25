@@ -28,6 +28,9 @@
       </form>
       <p>hello world</p>
     </div>
+
+    <a href="{{ url_for('main.logout') }}" style="color: white; background-color: red; padding: 10px; text-decoration: none; border-radius: 5px;">Logout</a>
+
     <script>
       $(document).ready(function () {
         function fetchUserList() {

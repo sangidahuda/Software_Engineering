@@ -4,7 +4,7 @@ from .extensions import db
 from .models import User, Message,PropertyListing, Photos, Reservation
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from flask_login import login_user, login_required, current_user
+from flask_login import login_user, login_required, current_user, logout_user
 from flask import jsonify
 from sqlalchemy import func, case
 import os
@@ -85,7 +85,6 @@ def get_my_conversation_with_owner():
         (Message.recipient_id == current_user.id)
     ).order_by(Message.timestamp.asc()).all()
 
-    # Transform the messages into a JSON-serializable format
     messages_data = [{
         'id': message.id,
         'sender_id': message.sender_id,
@@ -135,7 +134,7 @@ def admin_messages(user_id):
     return render_template('admin_messages.html', user=user, messages=messages)
 
 #################################################################### for sending client messages
-
+#owner messages client
 @main_bp.route('/send_message_to_user/<int:user_id>', methods=['POST'])
 @login_required
 def send_message_to_user(user_id):
@@ -150,7 +149,7 @@ def send_message_to_user(user_id):
     return jsonify({'message': 'Message sent successfully'})
 
 #################################################################### for creating a new property listing
-
+# This route will be used to create a new property listing for the owner.
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -213,7 +212,15 @@ def create_property_listing():
         flash('Property listing created successfully.')
         
         return redirect(url_for('main.admin_dashboard'))
+################################################################## for loging out admin from the dashboard
+@main_bp.route('/logout')
+@login_required
+def logout():
+    logout_user()  # Flask-Login utility to logout the current user
+    return redirect(url_for('main.index'))  # Redirect to the homepage or index route
+
 ####################################################################### for viewing property listings
+#this route will show all the property listings to the user.
 @main_bp.route('/get_property_listings')
 def get_property_listings():
     property_listings = PropertyListing.query.all()  
@@ -230,7 +237,13 @@ def get_property_listings():
             'bathrooms': property.bathrooms
         })
     return jsonify(properties)  
+####################################################################### for sender user to loging page
+#this route will redirect the user to the login page.
+@main_bp.route('/login_page')
+def login_page():
+    return redirect(url_for('main.login'))
 ######################################################################### Creates a reservation
+#this route will be used to create a reservation for a property listing.
 @main_bp.route('/create_reservation/<int:property_id>', methods=['POST'])
 @login_required
 def create_reservation(property_id):
@@ -288,7 +301,7 @@ def create_reservation(property_id):
     return redirect(url_for('main.property_detail', property_id=property_id))
 
 
-
+####################################################################
 
 
 
@@ -311,7 +324,7 @@ def index():
 @main_bp.route('/user_messages')
 @login_required
 def user_messages():
-    # Ensure only non-admin users can access this page
+    # Ensures only non-admin users can access this page
     if current_user.is_admin:
         return redirect(url_for('main.index'))  
     return render_template('user_messages.html')
@@ -319,7 +332,7 @@ def user_messages():
 @main_bp.route('/admin_dashboard')
 @login_required
 def admin_dashboard():
-    # Ensure only admin users can access this page
+    # Ensures only admin users can access this page
     if not current_user.is_admin:
         return redirect(url_for('main.index'))  
     return render_template('admin_dashboard.html')
