@@ -7,16 +7,17 @@ from flask_migrate import Migrate
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = '874y57843hfek43rsd4r4'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:1011@localhost/GSG'
+
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     migrate = Migrate(app, db)
 
-    app.config['UPLOAD_FOLDER'] = '/Users/jorgegonzales/Desktop/WebsiteImages'    
+    app.config['UPLOAD_FOLDER'] = '/Users/sangidahuda/Desktop/WebsiteImages'    
 
     db.init_app(app)
     login_manager.init_app(app)
 
-    from .models import User  # Import here to avoid circular imports
+
+    from .models import User  
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -25,7 +26,8 @@ def create_app():
     from .routes import main_bp
     app.register_blueprint(main_bp)
 
+# Create database tables for our data models
     with app.app_context():
-        db.create_all()  # Create database tables for our data models
+        db.create_all()  
 
     return app
