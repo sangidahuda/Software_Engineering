@@ -1,21 +1,32 @@
-<!-- property.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <h1>Hello World</h1>
   <meta charset="UTF-8">
   <title>{{ property.title }}</title>
-  <!-- Include your CSS files here -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='propertylisting.css') }}">
 </head>
 <body>
-  <div class="property-detail">
+  <div class="property-detail"> 
     <h1>{{ property.title }}</h1>
     <p>{{ property.description }}</p>
     <p>Bedrooms: {{ property.bedrooms }}</p>
     <p>Bathrooms: {{ property.bathrooms }}</p>
     <p>Price: ${{ property.price }}</p>
     <p>Location: {{ property.location }}</p>
-    <!-- Add more property details as needed -->
+
+  {% if current_user.is_authenticated %}
+    <form action="{{ url_for('main.create_reservation', property_id=property.id) }}" method="post">
+      <input type="hidden" name="property_id" value="{{ property.id }}">
+      <label for="start_date">Start Date:</label>
+      <input type="date" id="start_date" name="start_date" required>
+      <label for="end_date">End Date:</label>
+      <input type="date" id="end_date" name="end_date" required>
+      <button type="submit">Book Now</button>
+    </form>
+  {% else %}
+    <p>Please <a href="{{ url_for('main.login') }}">login</a> to make a reservation.</p>
+  {% endif %}
+  
   </div>
 </body>
 </html>
