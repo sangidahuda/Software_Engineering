@@ -16,14 +16,12 @@
       <button type="submit">Send Message</button>
     </form>
     <div id="messagesDisplay">
-      <!-- Messages will be displayed here -->
     </div>
+    <a href="{{ url_for('main.index') }}"> index.html</a>.
 
-    <!-- Include jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script type="text/javascript">
-      // Assign the current_user.id to a JavaScript variable
       var currentUserId = {{ current_user.id | tojson }};
     </script>
 
@@ -73,7 +71,6 @@
           });
         });
 
-        // Call fetchConversation on page load
         fetchConversation();
       });
     </script>
