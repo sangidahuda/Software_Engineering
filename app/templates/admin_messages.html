@@ -27,7 +27,6 @@
       <button type="submit">Send</button>
     </form>
 
-    <!-- This is for populating the list -->
     <script>
       $(document).ready(function () {
         $("#sendMessageForm").submit(function (e) {
@@ -39,11 +38,11 @@
             contentType: "application/json",
             data: JSON.stringify({ content: messageContent }),
             success: function (response) {
-              $("#messageList").append(
-                `<p><strong>You:</strong> ${messageContent}</p>`
-              );
+             $("#messageList").prepend(
+              `<p><strong>You:</strong> ${messageContent}</p>`
+               );
               $("#messageContent").val("");
-            },
+              },
             error: function () {
               alert("Message sending failed.");
             },
