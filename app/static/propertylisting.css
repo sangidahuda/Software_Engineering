@@ -1,26 +1,34 @@
 .property-detail {
-    font-family: Arial, sans-serif;
-    background-color: #aecbb7;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .property-detail h1 {
-    color: #333;
-    margin-bottom: 10px;
-  }
-  
-  .property-detail p {
-    color: #7a1717;
-    margin-bottom: 5px;
-  }
-  
+  font-family: Arial, sans-serif;
+  background-color: #aecbb7;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
 
+.property-detail h1 {
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.property-detail p {
+  color: #7a1717;
+  margin-bottom: 5px;
+}
 
 
 #map {
-    height: 400px;
-    width: 100%;
-  }
+  height: 400px;
+  width: 100%;
+}
+
+
+
+
+
+
+
+
+
+
   
