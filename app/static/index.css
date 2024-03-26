@@ -1,0 +1,124 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Font */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Main Content Container */
+.container {
+    width: 80%;
+    margin: auto;
+}
+
+/* Header */
+h1 {
+    text-align: center;
+    color: #222;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-size: 2rem;
+}
+
+/* Search Container */
+.search-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    padding: 20px;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border: 2px solid #007bff;
+    border-radius: 20px;
+    padding: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.search-input {
+    border: none;
+    padding: 10px;
+    margin-right: 10px;
+    border-radius: 15px;
+    outline: none;
+    width: 100%;
+}
+
+.search-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 15px;
+    transition: background-color 0.3s;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.search-button:hover {
+    background-color: #0056b3;
+}
+
+/* Login Button */
+a[href*="login"] {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 20px;
+    transition: background-color 0.3s;
+}
+
+a[href*="login"]:hover {
+    background-color: #218838;
+}
+
+/* Property List */
+#propertyList {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Increased min-width of the cards */
+    grid-gap: 20px; /* This controls the space between cards */
+    padding: 20px;
+}
+
+/* Property Item Cards */
+.property-item {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 25px; /* Increased padding for more internal space */
+    transition: box-shadow 0.3s, transform 0.3s;
+    cursor: pointer;
+    margin-bottom: 20px; /* Adds space below each card */
+}
+
+.property-item:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
+}
+
+.property-item h2 {
+    color: #007bff;
+    font-size: 1.8rem; /* Slightly larger titles within the card */
+    margin-bottom: 0.5rem;
+}
+
+.property-item p {
+    font-size: 1rem; /* Larger paragraph text */
+    color: #666;
+    margin-bottom: 0.5rem;
+}
