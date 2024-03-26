@@ -5,3 +5,8 @@ __pycache__/
 venv/
 __init__.py
 
+# npm package files
+node_modules/
+npm-debug.log
+package-lock.json
+package.json
