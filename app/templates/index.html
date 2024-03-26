@@ -1,23 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Property Listings</title>
-<<<<<<< HEAD
     <link
-    rel="stylesheet"
-    href="{{ url_for('static', filename='index.css') }}"
-  />
-=======
->>>>>>> 0b70ccf6840fc680f9ed761bc36f35d7c1a94c9f
-</head>
-<body>
+      rel="stylesheet"
+      href="{{ url_for('static', filename='index.css') }}"
+    />
+  </head>
+  <body>
     <h1>Property Listings</h1>
+    
+    <!-- Search Bar Container -->
+<div class="search-container">
+  <div class="search-box">
+      <input type="text" class="search-input" placeholder="Bedrooms">
+      <div class="search-Bathrooms">
+          <input type="text" class="search-input" placeholder="Bathrooms">
+      </div>
+      <div class="search-Price">
+          <input type="text" class="search-input" placeholder="Price">
+      </div>
+      <button class="search-button">Search</button>
+  </div>
+</div>
 
-    <a href="{{ url_for('main.login') }}" style="color: white; background-color: rgb(31, 142, 35); padding: 10px; text-decoration: none; border-radius: 5px;">Login</a>
 
-    <div id="propertyList">
-    </div>
+    <a
+      href="{{ url_for('main.login') }}"
+      style="
+        color: white;
+        background-color: rgb(31, 142, 35);
+        padding: 10px;
+        text-decoration: none;
+        border-radius: 5px;
+      "
+      >Login</a
+    >
+
+    <div id="propertyList"></div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
@@ -31,15 +52,19 @@
               propertyList.empty(); // Clear any existing content
               properties.forEach(function (property) {
                 // Create a clickable div element for each property
-                var listing = $('<div class="property-item" style="cursor: pointer;">');
-                listing.append($('<h2>').text(property.title));
-                listing.append($('<p>').text(property.description));
-                listing.append($('<p>').text('Bedrooms: ' + property.bedrooms));
-                listing.append($('<p>').text('Bathrooms: ' + property.bathrooms));
-                listing.append($('<p>').text('Price: $' + property.price));
-                listing.append($('<p>').text('Location: ' + property.location));
+                var listing = $(
+                  '<div class="property-item" style="cursor: pointer;">'
+                );
+                listing.append($("<h2>").text(property.title));
+                listing.append($("<p>").text(property.description));
+                listing.append($("<p>").text("Bedrooms: " + property.bedrooms));
+                listing.append(
+                  $("<p>").text("Bathrooms: " + property.bathrooms)
+                );
+                listing.append($("<p>").text("Price: $" + property.price));
+                listing.append($("<p>").text("Location: " + property.location));
                 // Redirect to the property detail page on click
-                listing.on('click', function () {
+                listing.on("click", function () {
                   window.location.href = "/property/" + property.id;
                 });
                 propertyList.append(listing);
@@ -47,13 +72,12 @@
             },
             error: function (error) {
               console.log("Error fetching property listings:", error);
-            }
+            },
           });
         }
-    
+
         fetchPropertyListings();
       });
     </script>
-    
-</body>
+  </body>
 </html>
