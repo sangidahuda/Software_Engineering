@@ -220,13 +220,19 @@ def logout():
     return redirect(url_for('main.index'))  # Redirect to the homepage or index route
 
 ####################################################################### for viewing property listings
-#this route will show all the property listings to the user.
 @main_bp.route('/get_property_listings')
 def get_property_listings():
-    property_listings = PropertyListing.query.all()  
-    properties = []  
+    property_listings = PropertyListing.query.all()
+    properties = []
 
     for property in property_listings:
+        
+        first_photo = Photos.query.filter_by(property_id=property.id).first()
+        
+        # Use the new route for serving images
+        photo_url = url_for('static', filename=f'WebsiteImages/{first_photo.photo}') if first_photo else None
+
+
         properties.append({
             'id': property.id,
             'title': property.title,
@@ -234,9 +240,11 @@ def get_property_listings():
             'price': property.price,
             'location': property.location,
             'bedrooms': property.bedrooms,
-            'bathrooms': property.bathrooms
+            'bathrooms': property.bathrooms,
+            'photo_url': photo_url  # Add the URL of the first photo
         })
-    return jsonify(properties)  
+
+    return jsonify(properties)
 ####################################################################### for sender user to loging page
 #this route will redirect the user to the login page.
 @main_bp.route('/login_page')
@@ -302,9 +310,23 @@ def create_reservation(property_id):
 
 
 ####################################################################
+# User dashboard
+@main_bp.route('/user_dashboard')
+@login_required
+def user_dashboard():
+   if current_user.is_authenticated:
+       user_reservations = db.session.query(Reservation, PropertyListing)\
+           .join(PropertyListing, Reservation.property_id == PropertyListing.id)\
+           .filter(Reservation.user_id == current_user.id).all()
+      
+       return render_template('User_dashboard.html', user=current_user, user_reservations=user_reservations)
+   else:
+       return redirect(url_for('main.login'))
+
+####################################################################################propery images
 
 
-
+   
 
 
 

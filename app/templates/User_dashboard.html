@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Your Title Here</title>
+ <link
+ rel="stylesheet"
+ href="{{ url_for('static', filename='Udashboard.css') }}"/>
+</head>
+
+
+<body>
+ <h2>Welcome, {{ user.name }}</h2>
+ <p>Your email is: {{ user.email }}</p>
+ <a href="{{ url_for('main.logout') }}">Logout</a>
+
+
+ <div class="reservations">
+   <h2>Reservations</h2>
+   <table>
+     <tr>
+       <th>Room</th>
+       <th>Check-in</th>
+       <th>Check-out</th>
+       <th>Total</th>
+     </tr>
+     {% for reservation, property in user_reservations %}
+     <tr>
+       <td>{{ property.title }}</td>
+       <td>{{ reservation.start_date.strftime('%Y-%m-%d') }}</td>
+       <td>{{ reservation.end_date.strftime('%Y-%m-%d') }}</td>
+       <td>${{ reservation.total }}</td>
+     </tr>
+     {% endfor %}
+   </table>
+</div>
+<a href="{{ url_for('main.user_messages') }}">Send Message to Owner</a>
+
+
+</body>
+
+
+</html>

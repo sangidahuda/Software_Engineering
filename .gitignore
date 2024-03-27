@@ -4,7 +4,7 @@ __pycache__/
 .DS_Store
 venv/
 __init__.py
-
+WebsiteImages
 # npm package files
 node_modules/
 npm-debug.log
