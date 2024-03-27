@@ -5,6 +5,57 @@
     box-sizing: border-box;
 }
 
+.name12 {
+    color: white;
+}
+
+.big-container {
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    height: 100vh;
+    margin-top: 60px;
+}
+
+.background-img {
+    margin-top: 60; 
+    position: relative;
+    height: 60vh; 
+    width: 100%; 
+    border-radius: 20px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.background-img::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('Atlantic City.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    /* filter: blur(1px); Adjust the blur level as needed */
+    z-index: -1;
+}
+
+.background-img::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(84, 79, 121, 0.5); 
+    z-index: -1;
+}
+
+/* *************************** */
 /* Font */
 body {
     font-family: 'Arial', sans-serif;
@@ -34,6 +85,7 @@ h1 {
     justify-content: center;
     margin-bottom: 20px;
     padding: 20px;
+    
 }
 
 .search-box {
@@ -131,6 +183,7 @@ body {
     overflow: hidden;
     background-color: #075fbd;
     padding: 0 20px;
+    margin-bottom: 60px;
   }
   .navbar a {
     float: left;

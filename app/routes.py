@@ -5,7 +5,7 @@ from .models import User, Message,PropertyListing, Photos, Reservation
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from flask_login import login_user, login_required, current_user, logout_user
-from flask import jsonify
+from flask import jsonify,send_from_directory
 from sqlalchemy import func, case
 import os
 from datetime import datetime, timedelta
@@ -56,7 +56,7 @@ def login():
             if user.is_admin:
                 return redirect(url_for('main.admin_dashboard'))
             else:  # This else should align with if user.is_admin
-                return redirect(url_for('main.user_messages'))
+                return redirect(url_for('main.'))
         else:
             flash('Invalid email or password.')  
 
@@ -216,23 +216,23 @@ def create_property_listing():
 @main_bp.route('/logout')
 @login_required
 def logout():
-    logout_user()  # Flask-Login utility to logout the current user
-    return redirect(url_for('main.index'))  # Redirect to the homepage or index route
+    logout_user()
+    return redirect(url_for('main.index')) 
+
+######################################################################## for setting file location
+@main_bp.route('/uploads/<filename>')
+def uploaded_file(filename):
+    upload_folder = '/Users/jorgegonzales/Desktop/WebsiteImages'
+    return send_from_directory(upload_folder, filename)
 
 ####################################################################### for viewing property listings
 @main_bp.route('/get_property_listings')
 def get_property_listings():
     property_listings = PropertyListing.query.all()
     properties = []
-
     for property in property_listings:
-        
         first_photo = Photos.query.filter_by(property_id=property.id).first()
-        
-        # Use the new route for serving images
-        photo_url = url_for('static', filename=f'WebsiteImages/{first_photo.photo}') if first_photo else None
-
-
+        photo_url = url_for('main.uploaded_file', filename=first_photo.photo) if first_photo else None
         properties.append({
             'id': property.id,
             'title': property.title,
@@ -241,9 +241,8 @@ def get_property_listings():
             'location': property.location,
             'bedrooms': property.bedrooms,
             'bathrooms': property.bathrooms,
-            'photo_url': photo_url  # Add the URL of the first photo
+            'photo_url': photo_url
         })
-
     return jsonify(properties)
 ####################################################################### for sender user to loging page
 #this route will redirect the user to the login page.

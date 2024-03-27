@@ -22,6 +22,19 @@
     <p>Location: {{ property.location }}</p>
   </div>
 
+  {% if current_user.is_authenticated %}
+    <form action="{{ url_for('main.create_reservation', property_id=property.id) }}" method="post">
+      <input type="hidden" name="property_id" value="{{ property.id }}">
+      <label for="start_date">Start Date:</label>
+      <input type="date" id="start_date" name="start_date" required>
+      <label for="end_date">End Date:</label>
+      <input type="date" id="end_date" name="end_date" required>
+      <button type="submit">Book Now</button>
+    </form>
+  {% else %}
+    <p>Please <a href="{{ url_for('main.login') }}">login</a> to make a reservation.</p>
+  {% endif %}
+
   <!-- Slider main container -->
 <div class="swiper">
 
