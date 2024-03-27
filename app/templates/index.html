@@ -12,6 +12,10 @@
   </head>
   <body>
     <div class="navbar">
+      <a href="{{ url_for('main.index') }}">Home</a>
+      <a href="#news">News</a>
+      <a href="#contact">Contact</a>
+      <a href="{{ url_for('main.aboutus') }}">About</a> 
       <a class="active" href="#home">Home</a>
       <a href="{{ url_for('main.user_dashboard') }}">my dash</a>
       <a href="{{ url_for('main.user_messages') }}">message us</a>

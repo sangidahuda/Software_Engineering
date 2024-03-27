@@ -358,5 +358,7 @@ def admin_dashboard():
         return redirect(url_for('main.index'))  
     return render_template('admin_dashboard.html')
 
-
+@main_bp.route('/aboutus')
+def aboutus():
+    return render_template('aboutus.html')
 
