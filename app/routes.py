@@ -56,7 +56,7 @@ def login():
             if user.is_admin:
                 return redirect(url_for('main.admin_dashboard'))
             else:  # This else should align with if user.is_admin
-                return redirect(url_for('main.'))
+                return redirect(url_for('main.index'))
         else:
             flash('Invalid email or password.')  
 
