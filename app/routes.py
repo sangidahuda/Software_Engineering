@@ -42,7 +42,7 @@ def register():
     return render_template('register.html')
 
 
-# Here is the code for the login route.
+############################################################### Here is the code for the login route.
 
 @main_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -76,6 +76,7 @@ def send_message():
   db.session.commit()
 
   return jsonify({'message': 'Message sent successfully', 'content': content})
+##########################################################################shows the messages with owner 
 
 @main_bp.route('/get_my_conversation_with_owner')
 @login_required
@@ -273,13 +274,11 @@ def create_reservation(property_id):
     property = PropertyListing.query.get_or_404(property_id)
     base_price = property.price
 
-    # Checks for advance booking discount (6 months ahead)
     six_months_from_now = datetime.today() + timedelta(days=30*6)
     discount = 0
     if start_date >= six_months_from_now:
         discount = 0.1  # 10% discount for bookings made at least 6 months in advance
 
-    # Calculate total price before discount
     total_price_before_discount = base_price * reservation_days
 
     # Apply discount if any
@@ -291,7 +290,7 @@ def create_reservation(property_id):
         start_date=start_date,
         end_date=end_date,
         status='pending',
-        total=discounted_total_price  # This is the total price after discount if any
+        total=discounted_total_price  
     )
     db.session.add(new_reservation)
 
@@ -308,24 +307,24 @@ def create_reservation(property_id):
     return redirect(url_for('main.property_detail', property_id=property_id))
 
 
-####################################################################
-# User dashboard
+############################################################################### User dashboard
+
 @main_bp.route('/user_dashboard')
 @login_required
 def user_dashboard():
-   if current_user.is_authenticated:
-       user_reservations = db.session.query(Reservation, PropertyListing)\
-           .join(PropertyListing, Reservation.property_id == PropertyListing.id)\
-           .filter(Reservation.user_id == current_user.id).all()
-      
-       return render_template('User_dashboard.html', user=current_user, user_reservations=user_reservations)
-   else:
-       return redirect(url_for('main.login'))
+    if current_user.is_authenticated:
+        if current_user.is_admin:
+            return redirect(url_for('main.admin_dashboard'))
+        else:
+            user_reservations = db.session.query(Reservation, PropertyListing)\
+                .join(PropertyListing, Reservation.property_id == PropertyListing.id)\
+                .filter(Reservation.user_id == current_user.id).all()
+            
+            return render_template('User_dashboard.html', user=current_user, user_reservations=user_reservations)
+    else:
+        return redirect(url_for('main.login'))
 
-####################################################################################propery images
-
-
-   
+####################################################################################
 
 
 

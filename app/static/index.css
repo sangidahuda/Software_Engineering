@@ -1,4 +1,3 @@
-/* General Reset */
 * {
     margin: 0;
     padding: 0;
@@ -40,7 +39,6 @@
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    /* filter: blur(1px); Adjust the blur level as needed */
     z-index: -1;
 }
 
@@ -64,13 +62,11 @@ body {
     line-height: 1.6;
 }
 
-/* Main Content Container */
 .container {
     width: 80%;
     margin: auto;
 }
 
-/* Header */
 h1 {
     text-align: center;
     color: #222;
@@ -79,7 +75,6 @@ h1 {
     font-size: 2rem;
 }
 
-/* Search Container */
 .search-container {
     display: flex;
     justify-content: center;
@@ -123,17 +118,6 @@ h1 {
     background-color: #0056b3;
 }
 
-/* Login Button */
-a[href*="login"] {
-    background-color: #28a745;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    text-decoration: none;
-    display: inline-block;
-    margin-top: 20px;
-    transition: background-color 0.3s;
-}
 
 a[href*="login"]:hover {
     background-color: #218838;
@@ -142,8 +126,8 @@ a[href*="login"]:hover {
 /* Property List */
 #propertyList {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Increased min-width of the cards */
-    grid-gap: 20px; /* This controls the space between cards */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+    grid-gap: 20px; 
     padding: 20px;
 }
 
@@ -152,10 +136,10 @@ a[href*="login"]:hover {
     background: #fff;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 25px; /* Increased padding for more internal space */
+    padding: 25px; 
     transition: box-shadow 0.3s, transform 0.3s;
     cursor: pointer;
-    margin-bottom: 20px; /* Adds space below each card */
+    margin-bottom: 20px; 
 }
 
 .property-item:hover {
@@ -165,7 +149,7 @@ a[href*="login"]:hover {
 
 .property-item h2 {
     color: #007bff;
-    font-size: 1.8rem; /* Slightly larger titles within the card */
+    font-size: 1.8rem; 
     margin-bottom: 0.5rem;
 }
 
@@ -175,46 +159,13 @@ a[href*="login"]:hover {
     margin-bottom: 0.5rem;
 }
 /* *********************************************************************************** */
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-}
-.navbar {
-    display: flex;
-    align-items: center;
-    position: relative;
-    background-color: #003366; /* Or your navbar's background color */
-}
-
-.nav-links {
-    margin-left: 10px; /* Adjust this value to increase or decrease the spacing */
-}
-
-.nav-logo {
-    /* This will keep the logo centered in the navbar */
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-.navbar img {
-    max-height: 50px;
-}
-
-  /* Add your existing styling for the anchor tags and any other styling you have here */
-
-
-  /* Add your existing styling for the anchor tags and any other styling you have here */
-
 .navbar {
     overflow: hidden;
     background-color: #075fbd;
     padding: 0 20px;
-}
-.navbar a {
-
     margin-bottom: 60px;
   }
+  
   .navbar a {
     float: left;
     display: block;
@@ -223,15 +174,15 @@ body {
     padding: 14px 20px;
     text-decoration: none;
     transition: 0.4s;
-}
-.navbar a:hover {
+  }
+  
+  .navbar a:hover {
     background-color: #ddd;
     color: black;
-}
-.navbar a.active {
+  }
+  
+  .navbar a.active {
     background-color: #466b93;
     color: white;
-}
-.navbar a:not(.active):hover {
-    transform: scale(1.1);
-}
+  }
+  

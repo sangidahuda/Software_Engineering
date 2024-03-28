@@ -1,4 +1,3 @@
-/* Udashboard.css */
 
 
 body {
@@ -48,19 +47,14 @@ body {
   }
  
   /* ************************************************* */
-  body {
-    font-family: 'Arial', sans-serif;
-    line-height: 1.6;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f7fa;
-    color: #333;
-  }
-  
   .navbar {
     overflow: hidden;
     background-color: #075fbd;
     padding: 0 20px;
+    margin-top: -20px;
+    margin-left: -20px;
+    margin-right: -20px;
+   
   }
   
   .navbar a {

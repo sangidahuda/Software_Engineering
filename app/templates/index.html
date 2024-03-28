@@ -11,45 +11,35 @@
 
   </head>
   <body>
-    <div class="navbar">
-    <div class="navbar">
-      <a href="{{ url_for('main.index') }}">Home</a>
-      <a href="{{ url_for('main.aboutus') }}">About</a> 
-      <a href="{{ url_for('main.user_dashboard') }}">my dash</a>
-      <a href="{{ url_for('main.user_messages') }}">message us</a>
-    </div>
-      <div class="nav-logo">
-        <img src="{{ url_for('static', filename='image.png') }}" alt="Garden State Get Away">
+      <div class="navbar">
+        <a href="{{ url_for('main.index') }}">Home</a>
+        <a href="{{ url_for('main.aboutus') }}">About</a> 
+        <a href="{{ url_for('main.user_dashboard') }}">my dash</a>
+        <a href="{{ url_for('main.user_messages') }}">message us</a>
+        <a href="{{ url_for('main.login') }}">login </a>
       </div>
-    </div>
     
-    
-
-
-<div class = "background-img">
-    <h1>Property Listings</h1>
-    
-<div class = "big container">
- <div class = "background-img">
-    <h1 class="name12">Property Listings</h1>
-      <!-- Search Bar Container -->
-    <div class="search-container">
-      <div class="search-box">
-          <input type="text" class="search-input" placeholder="Bedrooms">
-          <div class="search-Bathrooms">
-              <input type="text" class="search-input" placeholder="Bathrooms">
-          </div>
-          <div class="search-Price">
-              <input type="text" class="search-input" placeholder="Price">
-          </div>
-          <button class="search-button">Search</button>
+  <div class = "big container">
+  <div class = "background-img">
+      <h1 class="name12">Property Listings</h1>
+        <!-- Search Bar Container -->
+      <div class="search-container">
+        <div class="search-box">
+            <input type="text" class="search-input" placeholder="Bedrooms">
+            <div class="search-Bathrooms">
+                <input type="text" class="search-input" placeholder="Bathrooms">
+            </div>
+            <div class="search-Price">
+                <input type="text" class="search-input" placeholder="Price">
+            </div>
+            <button class="search-button">Search</button>
+        </div>
       </div>
-    </div>
-</div>
+  </div>
 
  </div>
 </div>    
-    <a
+    <!-- <a
       href="{{ url_for('main.login') }}"
       style="
         color: white;
@@ -58,7 +48,7 @@
         text-decoration: none;
         border-radius: 5px;
       "
-      >Login</a>
+      >Login</a> -->
 
     <div id="propertyList"></div>
 
