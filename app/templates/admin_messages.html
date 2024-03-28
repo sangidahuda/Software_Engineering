@@ -10,6 +10,13 @@
   />
   </head>
   <body>
+    <div class="navbar">
+      <a href="{{ url_for('main.index') }}">Home</a>
+      <a href="{{ url_for('main.aboutus') }}">About</a> 
+      <a href="{{ url_for('main.user_dashboard') }}">my dash</a>
+      <a href="{{ url_for('main.user_messages') }}">message us</a>
+      <a href="{{ url_for('main.login') }}">login </a>
+    </div>
     <h2>Chat with {{ user.name }}</h2>
     <div id="messageList">
       {% for message in messages %}
