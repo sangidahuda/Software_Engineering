@@ -11,6 +11,12 @@
  href="{{ url_for('static', filename='Udashboard.css') }}"/>
 </head>
 
+<div class="navbar">
+    <a href="{{ url_for('main.index') }}">Home</a>
+    <a href="{{ url_for('main.aboutus') }}">About</a> 
+    <a href="{{ url_for('main.user_dashboard') }}">my dash</a>
+    <a href="{{ url_for('main.user_messages') }}">message us</a>
+  </div>
 
 <body>
  <h2>Welcome, {{ user.name }}</h2>
