@@ -3,16 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <title>{{ property.title }}</title>
-  <link
-  rel="stylesheet"
-  href="{{ url_for('static', filename='propertylisting.css') }}">
-
-  <link 
-  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='propertylisting.css') }}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-  
-/></head>
+</head>
 <body>
+
   <div class="property-detail"> 
     <h1>{{ property.title }}</h1>
     <p>{{ property.description }}</p>
@@ -22,113 +18,82 @@
     <p>Location: {{ property.location }}</p>
   </div>
 
+  {% if current_user.is_authenticated %}
+    <form action="{{ url_for('main.create_reservation', property_id=property.id) }}" method="post">
+      <input type="hidden" name="property_id" value="{{ property.id }}">
+      <label for="start_date">Start Date:</label>
+      <input type="date" id="start_date" name="start_date" required>
+      <label for="end_date">End Date:</label>
+      <input type="date" id="end_date" name="end_date" required>
+      <button type="submit">Book Now</button>
+    </form>
+  {% else %}
+    <p>Please <a href="{{ url_for('main.login') }}">login</a> to make a reservation.</p>
+  {% endif %}
+
   <!-- Slider main container -->
-<div class="swiper">
+  <div class="swiper">
 
-  <!-- Additional required wrapper -->
-  <div class="swiper-wrapper">
     
-    <!-- Slides -->
-    <div class="swiper-slide">Slide 1</div>
-    <div class="swiper-slide">Slide 2</div>
-    <div class="swiper-slide">Slide 3</div>
-    ...
-  </div>
-  
+    <div class="swiper-wrapper">
+      <!-- Slides -->
+      <div class="swiper-slide"><img src="{{ url_for('static', filename='house1.jpg') }}" alt="House 1"></div>
+      <div class="swiper-slide"><img src="{{ url_for('static', filename='house2.jpg') }}" alt="House 2"></div>
+      <div class="swiper-slide"><img src="{{ url_for('static', filename='house3.jpg') }}" alt="House 3"></div>
+     
+    </div>
 
-  <!-- navigation buttons -->
-  <div class="swiper-button-prev"></div>
-  <div class="swiper-button-next"></div>
+    <div class="swiper-pagination"></div>
+    <!-- navigation buttons -->
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-button-next"></div>
 
-  <!--scrollbar -->
-  <div class="swiper-scrollbar"></div>
-</div>
-
-<!-- Slider main container -->
-<div class="swiper">
-
-  <!-- Additional required wrapper -->
-  <div class="swiper-wrapper">
-
-  <!-- Slides -->
-  <div class="swiper-slide"><img src="{{ url_for('static', filename='house1.jpg') }}" alt="House 1"></div>
-  <div class="swiper-slide"><img src="{{ url_for('static', filename='house2.jpg') }}" alt="House 2"></div>
-  <div class="swiper-slide"><img src="{{ url_for('static', filename='house3.jpg') }}" alt="House 3"></div>
-    ...
+   
+    <div class="swiper-scrollbar"></div>
   </div>
 
-  <!--pagination -->
-  <div class="swiper-pagination"></div>
+  <div class="property-detail"> 
+    <!-- House Information -->
+    <h1>{{ property.title }}</h1>
+    <p>{{ property.description }}</p>
 
-  <!-- navigation buttons -->
-  <div class="swiper-button-prev"></div>
-  <div class="swiper-button-next"></div>
+    <!-- Extra House Information -->
+    <div class="house-info">
+      <div class="house-info-item">
+        <p>Bedrooms: 3</p>
+      </div>
+      <div class="house-info-item">
+        <p>Bathrooms: 2</p>
+      </div>
 
-  <!--scrollbar -->
-  <div class="swiper-scrollbar"></div>
-</div>
+        </ul>
+        <div class="about-property">
+          <h2>About the Property:</h2>
+          <p>{{ property.about }}</p>
+        </div>
+      </div>
+    </div>
 
+   
+  </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-  const swiper = new Swiper('.swiper', {
-
-    // parameters
-    direction: 'horizontal',
-    loop: true,
-
-    //pagination
-    pagination: {
-      el: '.swiper-pagination',
-    },
-
-    // Navigation arrows
-    navigation: {
-      nextEl: '.swiper-button-next',
-      prevEl: '.swiper-button-prev',
-    },
-
-    // scrollbar
-    scrollbar: {
-      el: '.swiper-scrollbar',
-    },
-  });
-});
-
+      const swiper = new Swiper('.swiper', {
+        direction: 'horizontal',
+        loop: true,
+        pagination: {
+          el: '.swiper-pagination',
+        },
+        navigation: {
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev',
+        },
+        scrollbar: {
+          el: '.swiper-scrollbar',
+        },
+      });
+    });
   </script>
- 
-        <style>
-          /* * {
-            margin: 0;
-            padding: 0;
-          }
-          #map {
-            height: 500px;
-            width: 100%;
-          } */
-        </style>
-
-    <!-- <div id="map"></div>
-    <script>
-      function initMap() {
-        var location = {lat: -25.363, lng: 131.044};
-        var map = new google.maps.Map(document.getElementById("map"), {
-          zoom: 4,
-          center: location 
-        });
-      }
-      AIzaSyDehlezbsZcJG_BKfUBcLamDBd1HXQbwOs
-    </script>   
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDehlezbsZcJG_BKfUBcLamDBd1HXQbwOs&callback=initMap">
-
-    </script>
-
-    </script> -->
-  </body>
-  </html>
-  
-
-
-
 </body>
 </html>

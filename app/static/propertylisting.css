@@ -1,34 +1,121 @@
-.property-detail {
+body {
   font-family: Arial, sans-serif;
-  background-color: #aecbb7;
-  padding: 20px;
-  border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  margin: 0;
+  padding: 0;
+  background-color: #f2f2f2; 
 }
 
+/* Container for the property details */
+.property-detail {
+  max-width: 800px; 
+  margin: 20px auto; 
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+
 .property-detail h1 {
-  color: #333;
+  font-size: 24px;
+  color: #2540dd;
   margin-bottom: 10px;
 }
 
+/* Property description */
 .property-detail p {
-  color: #7a1717;
+  color: #555555;
+  line-height: 1.5;
+}
+
+/* House info section */
+.house-info {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.house-info-item {
+  flex-basis: 50%;
+}
+
+.house-info-item p {
+  margin: 5px 0;
+}
+
+/* Facts and features */
+.house-info-item h2 {
+  font-size: 18px;
+  color: #333333;
+  margin-bottom: 10px;
+}
+
+.house-info-item ul {
+  padding-left: 20px;
+}
+
+.house-info-item ul li {
+  list-style-type: none;
   margin-bottom: 5px;
 }
 
+/* About the property section */
+.about-property {
+  margin-top: 20px;
+}
 
-#map {
-  height: 400px;
+.about-property h2 {
+  font-size: 18px;
+  color: #333333;
+  margin-bottom: 10px;
+}
+
+.about-property p {
+  color: #555555;
+  line-height: 1.5;
+}
+
+/* Swiper container */
+.swiper {
   width: 100%;
+  height: 400px; 
+}
+
+.swiper-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
 }
 
 
+.swiper-button-prev,
+.swiper-button-next {
+  color: #ffffff;
+  background-color: #f2f2f2;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  cursor: pointer;
+}
 
+.swiper-button-prev {
+  left: 10px;
+}
 
+.swiper-button-next {
+  right: 10px;
+}
 
-
-
-
-
-
-  
+.swiper-pagination {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
