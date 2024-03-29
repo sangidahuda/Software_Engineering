@@ -9,27 +9,7 @@
 </head>
 <body>
 
-  <div class="property-detail"> 
-    <h1>{{ property.title }}</h1>
-    <p>{{ property.description }}</p>
-    <p>Bedrooms: {{ property.bedrooms }}</p>
-    <p>Bathrooms: {{ property.bathrooms }}</p>
-    <p>Price: ${{ property.price }}</p>
-    <p>Location: {{ property.location }}</p>
-  </div>
-
-  {% if current_user.is_authenticated %}
-    <form action="{{ url_for('main.create_reservation', property_id=property.id) }}" method="post">
-      <input type="hidden" name="property_id" value="{{ property.id }}">
-      <label for="start_date">Start Date:</label>
-      <input type="date" id="start_date" name="start_date" required>
-      <label for="end_date">End Date:</label>
-      <input type="date" id="end_date" name="end_date" required>
-      <button type="submit">Book Now</button>
-    </form>
-  {% else %}
-    <p>Please <a href="{{ url_for('main.login') }}">login</a> to make a reservation.</p>
-  {% endif %}
+ 
 
   <!-- Slider main container -->
   <div class="swiper">
@@ -40,7 +20,12 @@
       <div class="swiper-slide"><img src="{{ url_for('static', filename='house1.jpg') }}" alt="House 1"></div>
       <div class="swiper-slide"><img src="{{ url_for('static', filename='house2.jpg') }}" alt="House 2"></div>
       <div class="swiper-slide"><img src="{{ url_for('static', filename='house3.jpg') }}" alt="House 3"></div>
-     
+    </div>
+
+    <div class="swiper-wrapper">
+      {% for photo_url in photo_urls %}
+      <div class="swiper-slide"><img src="{{ photo_url }}" alt="Property Listing Photo"></div>
+      {% endfor %}
     </div>
 
     <div class="swiper-pagination"></div>
@@ -52,30 +37,33 @@
     <div class="swiper-scrollbar"></div>
   </div>
 
+
+  </div>
   <div class="property-detail"> 
-    <!-- House Information -->
     <h1>{{ property.title }}</h1>
     <p>{{ property.description }}</p>
+    <p>Bedrooms: {{ property.bedrooms }}</p>
+    <p>Bathrooms: {{ property.bathrooms }}</p>
+    <p>Price: ${{ property.price }}</p>
+    <p>Location: {{ property.location }}</p>
 
-    <!-- Extra House Information -->
-    <div class="house-info">
-      <div class="house-info-item">
-        <p>Bedrooms: 3</p>
-      </div>
-      <div class="house-info-item">
-        <p>Bathrooms: 2</p>
-      </div>
 
-        </ul>
-        <div class="about-property">
-          <h2>About the Property:</h2>
-          <p>{{ property.about }}</p>
-        </div>
-      </div>
-    </div>
 
-   
+    {% if current_user.is_authenticated %}
+    <form action="{{ url_for('main.create_reservation', property_id=property.id) }}" method="post">
+      <input type="hidden" name="property_id" value="{{ property.id }}">
+      <label for="start_date">Start Date:</label>
+      <input type="date" id="start_date" name="start_date" required>
+      <label for="end_date">End Date:</label>
+      <input type="date" id="end_date" name="end_date" required>
+      <button type="submit">Book Now</button>
+    </form>
+  {% else %}
+    <p>Please <a href="{{ url_for('main.login') }}">login</a> to make a reservation.</p>
+  {% endif %}
   </div>
+
+ 
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
