@@ -324,14 +324,18 @@ def user_dashboard():
     else:
         return redirect(url_for('main.login'))
 
-####################################################################################
-
-
+############################################################################### for viewing property details
+# @main_bp.route('/property/<int:property_id>')
+# def property_detail(property_id):
+#     property = PropertyListing.query.get_or_404(property_id)
+#     return render_template('property.html', property=property)
 
 @main_bp.route('/property/<int:property_id>')
 def property_detail(property_id):
     property = PropertyListing.query.get_or_404(property_id)
-    return render_template('property.html', property=property)
+    # Assuming each property has a .photos attribute that returns a list of Photo objects
+    photo_urls = [url_for('static', filename=photo.image_path) for photo in property.photos]
+    return render_template('property_detail.html', property=property, photo_urls=photo_urls)
 
 
 
