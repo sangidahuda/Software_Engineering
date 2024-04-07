@@ -134,6 +134,14 @@ def admin_messages(user_id):
 
     return render_template('admin_messages.html', user=user, messages=messages)
 
+################################################################## for deleting messages
+# @main_bp.route('/delete_message/<int:message_id>', methods=['POST'])
+# def delete_message(message_id):
+#     message = Message.query.get_or_404(message_id)
+#     db.session.delete(message)
+#     db.session.commit()
+#     return jsonify({"success": True})
+
 #################################################################### for sending client messages
 #owner messages client
 @main_bp.route('/send_message_to_user/<int:user_id>', methods=['POST'])
