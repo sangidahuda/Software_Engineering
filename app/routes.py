@@ -332,7 +332,39 @@ def user_dashboard():
     else:
         return redirect(url_for('main.login'))
 
-############################################################################### for viewing property details
+############################################################################### for viewing searched property listings
+@main_bp.route('/search_property_listings')
+def search_property_listings():
+    bedrooms = request.args.get('bedrooms', type=int)
+    bathrooms = request.args.get('bathrooms', type=int)
+    price = request.args.get('price', type=int)
+
+    query = PropertyListing.query
+
+    if bedrooms:
+        query = query.filter(PropertyListing.bedrooms == bedrooms)
+    if bathrooms:
+        query = query.filter(PropertyListing.bathrooms == bathrooms)
+    if price:
+        query = query.filter(PropertyListing.price <= price)
+
+    properties = query.all()
+
+    properties_data = [{
+        'id': prop.id,
+        'title': prop.title,
+        'bedrooms': prop.bedrooms,
+        'bathrooms': prop.bathrooms,
+        'price': prop.price,
+        'first_photo_url': prop.photos[0].photo if prop.photos else None
+    } for prop in properties]
+
+    return jsonify(properties_data)
+
+
+
+
+
 
 
 @main_bp.route('/property/<int:property_id>')
