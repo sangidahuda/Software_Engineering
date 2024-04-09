@@ -36,7 +36,6 @@
 
  </div>
 </div>    
-    
 
     <div id="propertyList"></div>
 
@@ -88,9 +87,7 @@
 <script>
   $(document).ready(function() {
       $('#search-form').submit(function(event) {
-          event.preventDefault(); // Stop the form from submitting traditionally
-          
-          // Here you dynamically build the URL based on the input values
+          event.preventDefault(); 
           var searchUrl = "{{ url_for('main.search_property_listings') }}" 
                         + "?bedrooms=" + $('input[name="bedrooms"]').val()
                         + "&bathrooms=" + $('input[name="bathrooms"]').val()
@@ -100,19 +97,18 @@
               url: searchUrl,
               type: 'GET',
               success: function(data) {
-                  // Assume data is the list of properties matching search criteria
                   var propertyList = $("#propertyList");
-                  propertyList.empty(); // Clear previous results
+                  propertyList.empty(); 
   
-                  // Dynamically create and append property listings to the DOM
+                  //  creates and append property listings to the DOM
                   data.forEach(function(property) {
                       var listing = $('<div class="property-item">')
                           .append($('<h2>').text(property.title))
                           .append($('<p>').text("Bedrooms: " + property.bedrooms))
                           .append($('<p>').text("Bathrooms: " + property.bathrooms))
                           .append($('<p>').text("Price: $" + property.price));
-  
-                      // Add the listing to the property list container
+
+                      // adds to the list div
                       propertyList.append(listing);
                   });
               },
