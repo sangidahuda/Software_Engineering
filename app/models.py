@@ -56,4 +56,12 @@ class Reservation(db.Model):
     total = db.Column(db.Numeric(10, 2), nullable=False)  # Add this line
 
 
+class Review(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    author = db.Column(db.String(100), nullable=False)
+    text = db.Column(db.Text, nullable=False)
+    property_id = db.Column(db.Integer, db.ForeignKey('property_listing.id'), nullable=False)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+
+    property = db.relationship('PropertyListing', backref=db.backref('reviews', lazy='dynamic'))
 

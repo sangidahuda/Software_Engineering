@@ -2,85 +2,104 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+
   <title>{{ property.title }}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='propertylisting.css') }}">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 </head>
 <body>
-
- 
-
-  <!-- Slider main container -->
-  <div class="swiper">
-
-    
-    <div class="swiper-wrapper">
-      <div class="swiper-slide"><img src="{{ url_for('static', filename='house1.jpg') }}" alt="House 1"></div>
-      <div class="swiper-slide"><img src="{{ url_for('static', filename='house2.jpg') }}" alt="House 2"></div>
-      <div class="swiper-slide"><img src="{{ url_for('static', filename='house3.jpg') }}" alt="House 3"></div>
-    </div>
-
-    <div class="swiper-wrapper">
-      {% for photo_url in photo_urls %}
-      <div class="swiper-slide"><img src="{{ photo_url }}" alt="Property Listing Photo"></div>
-      {% endfor %}
-    </div>
-
-    <div class="swiper-pagination"></div>
-    <!-- navigation buttons -->
-    <div class="swiper-button-prev"></div>
-    <div class="swiper-button-next"></div>
-
-   
-    <div class="swiper-scrollbar"></div>
+  <div class="navbar">
+    <a href="{{ url_for('main.index') }}">Home</a>
+    <a href="{{ url_for('main.aboutus') }}">About</a> 
+    <a href="{{ url_for('main.user_dashboard') }}">my dash</a>
+    <a href="{{ url_for('main.user_messages') }}">message us</a>
+    <a href="{{ url_for('main.login') }}">login </a>
   </div>
 
-
+<div class="swiper">
+  <div class="swiper-wrapper">
+    {% for photo_url in photo_urls %}
+    <div class="swiper-slide"><img src="{{ photo_url }}" alt="Property Listing Photo"></div>
+    {% endfor %}
   </div>
-  <div class="property-detail"> 
-    <h1>{{ property.title }}</h1>
-    <p>{{ property.description }}</p>
-    <p>Bedrooms: {{ property.bedrooms }}</p>
-    <p>Bathrooms: {{ property.bathrooms }}</p>
-    <p>Price: ${{ property.price }}</p>
-    <p>Location: {{ property.location }}</p>
+  <div class="swiper-pagination"></div>
+  <div class="swiper-button-prev"></div>
+  <div class="swiper-button-next"></div>
+  <div class="swiper-scrollbar"></div>
+</div>
 
+<div class="property-detail"> 
+  <h1>{{ property.title }}</h1>
+  <p>{{ property.description }}</p>
+  <p>Bedrooms: {{ property.bedrooms }}</p>
+  <p>Bathrooms: {{ property.bathrooms }}</p>
+  <p>Price: ${{ property.price }}</p>
+  <p>Location: {{ property.location }}</p>
 
-
-    {% if current_user.is_authenticated %}
-    <form action="{{ url_for('main.create_reservation', property_id=property.id) }}" method="post">
-      <input type="hidden" name="property_id" value="{{ property.id }}">
-      <label for="start_date">Start Date:</label>
-      <input type="date" id="start_date" name="start_date" required>
-      <label for="end_date">End Date:</label>
-      <input type="date" id="end_date" name="end_date" required>
-      <button type="submit">Book Now</button>
-    </form>
+  {% if current_user.is_authenticated %}
+  <form action="{{ url_for('main.create_reservation', property_id=property.id) }}" method="post">
+    <input type="hidden" name="property_id" value="{{ property.id }}">
+    <label for="start_date">Start Date:</label>
+    <input type="date" id="start_date" name="start_date" required>
+    <label for="end_date">End Date:</label>
+    <input type="date" id="end_date" name="end_date" required>
+    <button type="submit">Book Now</button>
+  </form>
   {% else %}
-    <p>Please <a href="{{ url_for('main.login') }}">login</a> to make a reservation.</p>
+  <p>Please <a href="{{ url_for('main.login') }}">login</a> to make a reservation.</p>
   {% endif %}
+</div>
+
+<div id="reviews-section">
+  <h2>Reviews</h2>
+  <div id="reviews-container">
+
   </div>
 
- 
+  {% if current_user.is_authenticated %}
+  <h3>Review this property</h3>
+  <form id="review-form" action="{{ url_for('main.add_review') }}" method="POST">
+    <input type="hidden" name="property_id" value="{{ property.id }}">
+    <textarea name="text" placeholder="Write your review here..." required></textarea>
+    <button type="submit">Submit Review</button>
+  </form>
+  {% else %}
+  <p><a href="{{ url_for('main.login') }}">Log in</a> to write a review.</p>
+  {% endif %}
+</div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const swiper = new Swiper('.swiper', {
-        direction: 'horizontal',
-        loop: true,
-        pagination: {
-          el: '.swiper-pagination',
-        },
-        navigation: {
-          nextEl: '.swiper-button-next',
-          prevEl: '.swiper-button-prev',
-        },
-        scrollbar: {
-          el: '.swiper-scrollbar',
-        },
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const swiper = new Swiper('.swiper', {
+  });
+});
+
+$(document).ready(function() {
+  var propertyId = "{{ property.id }}";
+  $.ajax({
+    url: "/reviews/" + propertyId,
+    success: function(reviews) {
+      var container = $("#reviews-container");
+      reviews.forEach(function(review) {
+        var reviewElement = $("<div class='review'>").append(
+          $("<h4>").text(review.author),
+          $("<p>").text(review.text),
+          $("<span>").text("Posted on: " + review.timestamp)
+        );
+        container.append(reviewElement);
       });
+    }
+  });
+  
+  $("#review-form").submit(function(e) {
+    e.preventDefault();
+    $.post($(this).attr("action"), $(this).serialize(), function() {
     });
-  </script>
+  });
+});
+</script>
 </body>
 </html>

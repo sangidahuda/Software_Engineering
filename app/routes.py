@@ -1,7 +1,7 @@
 # app/routes.py
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify,current_app
 from .extensions import db
-from .models import User, Message,PropertyListing, Photos, Reservation
+from .models import User, Message,PropertyListing, Photos, Reservation, Review
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from flask_login import login_user, login_required, current_user, logout_user
@@ -134,14 +134,6 @@ def admin_messages(user_id):
 
     return render_template('admin_messages.html', user=user, messages=messages)
 
-################################################################## for deleting messages
-# @main_bp.route('/delete_message/<int:message_id>', methods=['POST'])
-# def delete_message(message_id):
-#     message = Message.query.get_or_404(message_id)
-#     db.session.delete(message)
-#     db.session.commit()
-#     return jsonify({"success": True})
-
 #################################################################### for sending client messages
 #owner messages client
 @main_bp.route('/send_message_to_user/<int:user_id>', methods=['POST'])
@@ -158,7 +150,6 @@ def send_message_to_user(user_id):
     return jsonify({'message': 'Message sent successfully'})
 
 #################################################################### for creating a new property listing
-# This route will be used to create a new property listing for the owner.
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -195,7 +186,6 @@ def create_property_listing():
         price = request.form.get('price')
         location = request.form.get('location')
         
-        # Saves the new property listing
         try:
             price = int(price)
         except ValueError:
@@ -276,7 +266,7 @@ def create_reservation(property_id):
     
     # Calculate the number of days of the reservation
     delta = end_date - start_date
-    reservation_days = delta.days + 1  # Includes both the check-in and check-out days
+    reservation_days = delta.days + 1  
 
     # gets the property to calculate the total cost
     property = PropertyListing.query.get_or_404(property_id)
@@ -289,7 +279,6 @@ def create_reservation(property_id):
 
     total_price_before_discount = base_price * reservation_days
 
-    # Apply discount if any
     discounted_total_price = total_price_before_discount - (total_price_before_discount * discount)
 
     new_reservation = Reservation(
@@ -360,9 +349,30 @@ def search_property_listings():
     } for prop in properties]
 
     return jsonify(properties_data)
+#################################################################### shows Reviews
+@main_bp.route('/reviews/<int:property_id>')
+def get_reviews(property_id):
+    property = PropertyListing.query.get_or_404(property_id)
+    reviews = property.reviews.order_by(Review.timestamp.desc()).all()
+    reviews_data = [{'author': review.author, 'text': review.text, 'timestamp': review.timestamp.strftime('%Y-%m-%d %H:%M:%S')} for review in reviews]
+    return jsonify(reviews_data)
+
+#################################################################### Add a review
+@main_bp.route('/reviews/add', methods=['POST'])
+@login_required
+def add_review():
+    property_id = request.form['property_id']
+    text = request.form['text']
+    author = current_user.name
+    
+    review = Review(author=author, text=text, property_id=property_id)
+    db.session.add(review)
+    db.session.commit()
+    
+    return redirect(url_for('main.property_detail', property_id=property_id))
 
 
-
+#################################################################### f
 
 
 
