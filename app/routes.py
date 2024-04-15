@@ -230,6 +230,26 @@ def delete_property(property_id):
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
     
+    
+
+
+    
+######################################################################## for updating property listing
+@main_bp.route('/update_property/<int:property_id>', methods=['POST'])
+@login_required
+def update_property(property_id):
+    if not current_user.is_admin:
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    property_to_update = PropertyListing.query.get_or_404(property_id)
+    property_to_update.title = request.form.get('title')
+    # update other fields as necessary
+    db.session.commit()
+    
+    flash('Property updated successfully.')
+    return redirect(url_for('main.edit_property', property_id=property_id))
+
+    
 ################################################################## for loging out admin from the dashboard
 @main_bp.route('/logout')
 @login_required
@@ -393,9 +413,6 @@ def add_review():
 
 #################################################################### f
 
-
-
-
 @main_bp.route('/property/<int:property_id>')
 def property_detail(property_id):
     property_listing = PropertyListing.query.get_or_404(property_id)  # Correctly assign to property_listing
@@ -403,6 +420,18 @@ def property_detail(property_id):
     return render_template('property.html', property=property_listing, photo_urls=photo_urls)
 
 
+
+
+#################################################################### renders each file when called 
+
+@main_bp.route('/edit_property/<int:property_id>')
+@login_required
+def edit_property(property_id):
+    if not current_user.is_admin:
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    property_to_edit = PropertyListing.query.get_or_404(property_id)
+    return render_template('edit_property.html', property=property_to_edit)
 
 @main_bp.route('/index')
 def index():
