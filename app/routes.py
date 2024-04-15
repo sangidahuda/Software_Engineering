@@ -211,6 +211,25 @@ def create_property_listing():
         flash('Property listing created successfully.')
         
         return redirect(url_for('main.admin_dashboard'))
+#################################################################### Deleting property listing
+@main_bp.route('/delete_property/<int:property_id>', methods=['POST'])
+@login_required
+def delete_property(property_id):
+    if not current_user.is_admin:
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    property_to_delete = PropertyListing.query.get_or_404(property_id)
+    
+    Photos.query.filter_by(property_id=property_id).delete()
+
+    db.session.delete(property_to_delete)
+    try:
+        db.session.commit()
+        return jsonify({'message': 'Property deleted successfully'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+    
 ################################################################## for loging out admin from the dashboard
 @main_bp.route('/logout')
 @login_required

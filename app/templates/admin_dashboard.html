@@ -24,6 +24,15 @@
     </ul>
   </div>
 
+  <div id="property-container">
+    <h3>Properties</h3>
+    <div id="propertyList">
+      <!-- Property items will be added here by the script (js code) -->
+    </div>
+    
+  </div>
+
+
   <div id="propertyList">
     <form
       action="{{ url_for('main.create_property_listing') }}"
@@ -68,8 +77,66 @@
       fetchUserList();
     });
   </script>
+
+  <!-- this is for viewing the property listings -->
+  <script>
+    $(document).ready(function() {
+        // Fetch property listings on page load
+        fetchPropertyListings();
+    
+        function fetchPropertyListings() {
+            $.ajax({
+                url: "{{ url_for('main.get_property_listings') }}",
+                type: "GET",
+                success: function(response) {
+                    var propertyList = $("#propertyList");
+                    propertyList.empty(); 
+    
+                    response.forEach(function(property) {
+                        var listing = $('<div class="property-item">');
+                        listing.append($('<img>').attr('src', property.first_photo_url).css({ maxWidth: '100px', maxHeight: '100px' }));
+                        listing.append($('<div>').text(property.title + " - " + property.location + " - $" + property.price));
+                        listing.append($('<div>').text("Bedrooms: " + property.bedrooms + ", Bathrooms: " + property.bathrooms));
+    
+                        // Edit button
+                        var editButton = $('<button>').text('Edit').on('click', function() {
+                            window.location.href = "/edit_property/" + property.id; 
+                        });
+    
+                        // Delete button
+                        var deleteButton = $('<button>').text('Delete').on('click', function() {
+                            if (confirm('Are you sure you want to delete this property?')) {
+                                deleteProperty(property.id);
+                            }
+                        });
+    
+                        listing.append(editButton, deleteButton); 
+                        propertyList.append(listing); 
+                    });
+                },
+                error: function(error) {
+                    console.error("Error fetching property listings:", error);
+                }
+            });
+        }
+    
+        function deleteProperty(propertyId) {
+            $.ajax({
+                url: "/delete_property/" + propertyId, 
+                type: "POST",
+                success: function() {
+                    fetchPropertyListings(); 
+                },
+                error: function(error) {
+                    alert('Error deleting property: ' + error.responseText);
+                }
+            });
+        }
+    });
+    </script>
+    
   
 
 
-</body>
+</body
 </html>
