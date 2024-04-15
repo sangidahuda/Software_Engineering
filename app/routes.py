@@ -359,6 +359,38 @@ def user_dashboard():
             return render_template('User_dashboard.html', user=current_user, user_reservations=user_reservations)
     else:
         return redirect(url_for('main.login'))
+    
+############################################################## New route for deleting a reservation
+@main_bp.route('/delete_reservation/<int:reservation_id>', methods=['POST'])
+@login_required
+def delete_reservation(reservation_id):
+    reservation = Reservation.query.get_or_404(reservation_id)
+    if reservation.user_id != current_user.id:
+        flash('Unauthorized to delete this reservation.', 'error')
+        return redirect(url_for('main.user_dashboard'))
+
+    db.session.delete(reservation)
+    db.session.commit()
+
+    flash('Reservation deleted successfully.')
+    return redirect(url_for('main.user_dashboard'))
+
+################################################################### New route for deleting a user account
+@main_bp.route('/delete_account', methods=['POST'])
+@login_required
+def delete_account():
+    user_id = request.form.get('user_id')
+    if user_id != str(current_user.id):
+        flash('Unauthorized to delete this account.', 'error')
+        return redirect(url_for('main.user_dashboard'))
+
+    user = User.query.get_or_404(user_id)
+    db.session.delete(user)
+    db.session.commit()
+    logout_user()
+    flash('Your account has been deleted successfully.')
+    return redirect(url_for('main.index'))
+
 
 ############################################################################### for viewing searched property listings
 @main_bp.route('/search_property_listings')
@@ -433,11 +465,12 @@ def edit_property(property_id):
     property_to_edit = PropertyListing.query.get_or_404(property_id)
     return render_template('edit_property.html', property=property_to_edit)
 
+
+
+
 @main_bp.route('/index')
 def index():
     return render_template('index.html')
-
-
 
 @main_bp.route('/user_messages')
 @login_required

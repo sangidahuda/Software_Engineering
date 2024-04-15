@@ -38,17 +38,36 @@
   <p>Location: {{ property.location }}</p>
 
   {% if current_user.is_authenticated %}
-  <form action="{{ url_for('main.create_reservation', property_id=property.id) }}" method="post">
-    <input type="hidden" name="property_id" value="{{ property.id }}">
-    <label for="start_date">Start Date:</label>
-    <input type="date" id="start_date" name="start_date" required>
-    <label for="end_date">End Date:</label>
-    <input type="date" id="end_date" name="end_date" required>
-    <button type="submit">Book Now</button>
-  </form>
-  {% else %}
-  <p>Please <a href="{{ url_for('main.login') }}">login</a> to make a reservation.</p>
-  {% endif %}
+      <form
+        action="{{ url_for('main.create_reservation', property_id=property.id) }}"
+        method="post"
+      >
+        <input type="hidden" name="property_id" value="{{ property.id }}" />
+        <label for="start_date">Start Date:</label>
+        <input
+          type="date"
+          id="start_date"
+          name="start_date"
+          required
+          onchange="calculateTotalCost()"
+        />
+        <label for="end_date">End Date:</label>
+        <input
+          type="date"
+          id="end_date"
+          name="end_date"
+          required
+          onchange="calculateTotalCost()"
+        />
+        <p>Total cost: $<span id="totalCost">0</span></p>
+        <button type="submit">Book Now</button>
+      </form>
+      {% else %}
+      <p>
+        Please <a href="{{ url_for('main.login') }}">login</a> to make a
+        reservation.
+      </p>
+      {% endif %}
 </div>
 
 <div id="reviews-section">
@@ -68,10 +87,35 @@
   <p><a href="{{ url_for('main.login') }}">Log in</a> to write a review.</p>
   {% endif %}
 </div>
+<!-- Script for caluclating stay cost  -->
 
+
+<!-- Script for reviewing the property -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
+
+function calculateTotalCost() {
+    const pricePerNight = {{ property.price }};
+    const startDateInput = document.getElementById('start_date');
+    const endDateInput = document.getElementById('end_date');
+    const totalCostSpan = document.getElementById('totalCost');
+
+    if (startDateInput.value && endDateInput.value) {
+          const startDate = new Date(startDateInput.value);
+          const endDate = new Date(endDateInput.value);
+          const timeDiff = endDate - startDate;
+          const daysDiff = timeDiff / (1000 * 60 * 60 * 24);
+    
+          if (daysDiff >= 0) {
+            const totalCost = (daysDiff + 1) * pricePerNight; // +1 to include both check-in and check-out days
+            totalCostSpan.textContent = totalCost.toFixed(2);
+          } else {
+            totalCostSpan.textContent = "0"; // Reset to 0 if end date is before start date
+          }
+        }
+      }
+    
 document.addEventListener('DOMContentLoaded', function () {
   const swiper = new Swiper('.swiper', {
   });
