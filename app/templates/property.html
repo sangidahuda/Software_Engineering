@@ -1,148 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-
-  <title>{{ property.title }}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='propertylisting.css') }}">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <meta charset="UTF-8">
+    <title>{{ property.title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='propertylisting.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css">
 </head>
 <body>
-  <div class="navbar">
-    <a href="{{ url_for('main.index') }}">Home</a>
-    <a href="{{ url_for('main.aboutus') }}">About</a> 
-    <a href="{{ url_for('main.user_dashboard') }}">my dash</a>
-    <a href="{{ url_for('main.user_messages') }}">message us</a>
-    <a href="{{ url_for('main.login') }}">login </a>
-  </div>
+    <div class="navbar">
+        <a href="{{ url_for('main.index') }}">Home</a>
+        <a href="{{ url_for('main.aboutus') }}">About</a>
+        <a href="{{ url_for('main.user_dashboard') }}">My Dashboard</a>
+        <a href="{{ url_for('main.user_messages') }}">Message Us</a>
+        <a href="{{ url_for('main.login') }}">Login</a>
+    </div>
 
-<div class="swiper">
-  <div class="swiper-wrapper">
-    {% for photo_url in photo_urls %}
-    <div class="swiper-slide"><img src="{{ photo_url }}" alt="Property Listing Photo"></div>
-    {% endfor %}
-  </div>
-  <div class="swiper-pagination"></div>
-  <div class="swiper-button-prev"></div>
-  <div class="swiper-button-next"></div>
-  <div class="swiper-scrollbar"></div>
-</div>
+    <div class="swiper-container">
+        <div class="swiper-wrapper">
+            {% for photo_url in photo_urls %}
+            <div class="swiper-slide">
+                <img src="{{ photo_url }}" alt="Property Image" style="width:100%; height: auto;">
+            </div>
+            {% endfor %}
+        </div>
+        <div class="swiper-pagination"></div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+    </div>
 
-<div class="property-detail"> 
-  <h1>{{ property.title }}</h1>
-  <p>{{ property.description }}</p>
-  <p>Bedrooms: {{ property.bedrooms }}</p>
-  <p>Bathrooms: {{ property.bathrooms }}</p>
-  <p>Price: ${{ property.price }}</p>
-  <p>Location: {{ property.location }}</p>
+    <div class="property-detail">
+        <h1>{{ property.title }}</h1>
+        <p>{{ property.description }}</p>
+        <p>Bedrooms: {{ property.bedrooms }}</p>
+        <p>Bathrooms: {{ property.bathrooms }}</p>
+        <p>Price: ${{ property.price }}</p>
+        <p>Location: {{ property.location }}</p>
 
-  {% if current_user.is_authenticated %}
-      <form
-        action="{{ url_for('main.create_reservation', property_id=property.id) }}"
-        method="post"
-      >
-        <input type="hidden" name="property_id" value="{{ property.id }}" />
-        <label for="start_date">Start Date:</label>
-        <input
-          type="date"
-          id="start_date"
-          name="start_date"
-          required
-          onchange="calculateTotalCost()"
-        />
-        <label for="end_date">End Date:</label>
-        <input
-          type="date"
-          id="end_date"
-          name="end_date"
-          required
-          onchange="calculateTotalCost()"
-        />
-        <p>Total cost: $<span id="totalCost">0</span></p>
-        <button type="submit">Book Now</button>
-      </form>
-      {% else %}
-      <p>
-        Please <a href="{{ url_for('main.login') }}">login</a> to make a
-        reservation.
-      </p>
-      {% endif %}
-</div>
+        {% if current_user.is_authenticated %}
+        <form action="{{ url_for('main.create_reservation', property_id=property.id) }}" method="post">
+            <input type="hidden" name="property_id" value="{{ property.id }}">
+            <label for="start_date">Start Date:</label>
+            <input type="date" id="start_date" name="start_date" required onchange="calculateTotalCost()">
+            <label for="end_date">End Date:</label>
+            <input type="date" id="end_date" name="end_date" required onchange="calculateTotalCost()">
+            <p>Total cost: $<span id="totalCost">0</span></p>
+            <button type="submit">Book Now</button>
+        </form>
+        {% else %}
+        <p>Please <a href="{{ url_for('main.login') }}">login</a> to make a reservation.</p>
+        {% endif %}
+    </div>
 
-<div id="reviews-section">
-  <h2>Reviews</h2>
-  <div id="reviews-container">
+    <div id="reviews-section">
+        <h2>Reviews</h2>
+        <div id="reviews-container"></div>
+        {% if current_user.is_authenticated %}
+        <h3>Review this property</h3>
+        <form id="review-form" action="{{ url_for('main.add_review') }}" method="POST">
+            <input type="hidden" name="property_id" value="{{ property.id }}">
+            <textarea name="text" placeholder="Write your review here..." required></textarea>
+            <button type="submit">Submit Review</button>
+        </form>
+        {% else %}
+        <p><a href="{{ url_for('main.login') }}">Log in</a> to write a review.</p>
+        {% endif %}
+    </div>
 
-  </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script>
+        var swiper = new Swiper('.swiper-container', {
+            loop: true,
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            autoHeight: true,
+            spaceBetween: 30
+        });
 
-  {% if current_user.is_authenticated %}
-  <h3>Review this property</h3>
-  <form id="review-form" action="{{ url_for('main.add_review') }}" method="POST">
-    <input type="hidden" name="property_id" value="{{ property.id }}">
-    <textarea name="text" placeholder="Write your review here..." required></textarea>
-    <button type="submit">Submit Review</button>
-  </form>
-  {% else %}
-  <p><a href="{{ url_for('main.login') }}">Log in</a> to write a review.</p>
-  {% endif %}
-</div>
+        function calculateTotalCost() {
+            const pricePerNight = {{ property.price }};
+            const startDateInput = document.getElementById('start_date');
+            const endDateInput = document.getElementById('end_date');
+            const totalCostSpan = document.getElementById('totalCost');
 
+            if (startDateInput.value && endDateInput.value) {
+                const startDate = new Date(startDateInput.value);
+                const endDate = new Date(endDateInput.value);
+                const timeDiff = endDate - startDate;
+                const daysDiff = timeDiff / (1000 * 60 * 60 * 24);
 
-<!-- Script for reviewing the property -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<script>
-
-function calculateTotalCost() {
-    const pricePerNight = {{ property.price }};
-    const startDateInput = document.getElementById('start_date');
-    const endDateInput = document.getElementById('end_date');
-    const totalCostSpan = document.getElementById('totalCost');
-
-    if (startDateInput.value && endDateInput.value) {
-          const startDate = new Date(startDateInput.value);
-          const endDate = new Date(endDateInput.value);
-          const timeDiff = endDate - startDate;
-          const daysDiff = timeDiff / (1000 * 60 * 60 * 24);
-    
-          if (daysDiff >= 0) {
-            const totalCost = (daysDiff + 1) * pricePerNight; // +1 to include both check-in and check-out days
-            totalCostSpan.textContent = totalCost.toFixed(2);
-          } else {
-            totalCostSpan.textContent = "0"; // Reset to 0 if end date is before start date
-          }
+                if (daysDiff >= 0) {
+                    const totalCost = (daysDiff + 1) * pricePerNight; // +1 to include both check-in and check-out days
+                    totalCostSpan.textContent = totalCost.toFixed(2);
+                } else {
+                    totalCostSpan.textContent = "0"; // Reset to 0 if end date is before start date
+                }
+            }
         }
-      }
-    
-document.addEventListener('DOMContentLoaded', function () {
-  const swiper = new Swiper('.swiper', {
-  });
-});
 
-$(document).ready(function() {
-  var propertyId = "{{ property.id }}";
-  $.ajax({
-    url: "/reviews/" + propertyId,
-    success: function(reviews) {
-      var container = $("#reviews-container");
-      reviews.forEach(function(review) {
-        var reviewElement = $("<div class='review'>").append(
-          $("<h4>").text(review.author),
-          $("<p>").text(review.text),
-          $("<span>").text("Posted on: " + review.timestamp)
-        );
-        container.append(reviewElement);
-      });
-    }
-  });
-  
-  $("#review-form").submit(function(e) {
-    e.preventDefault();
-    $.post($(this).attr("action"), $(this).serialize(), function() {
-    });
-  });
-});
-</script>
+        $(document).ready(function() {
+            var propertyId = "{{ property.id }}";
+            $.ajax({
+                url: "/reviews/" + propertyId,
+                success: function(reviews) {
+                    var container = $("#reviews-container");
+                    reviews.forEach(function(review) {
+                        var reviewElement = $("<div class='review'>").append(
+                            $("<h4>").text(review.author),
+                            $("<p>").text(review.text),
+                            $("<span>").text("Posted on: " + review.timestamp)
+                        );
+                        container.append(reviewElement);
+                    });
+                }
+            });
+            
+            $("#review-form").submit(function(e) {
+                e.preventDefault();
+                $.post($(this).attr("action"), $(this).serialize(), function(response) {
+                    alert("Review submitted successfully!");
+                    location.reload(); // Reload the page to update the reviews section
+                }).fail(function() {
+                    alert("Error submitting review.");
+                });
+            });
+        });
+    </script>
 </body>
 </html>

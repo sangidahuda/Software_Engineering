@@ -1,15 +1,15 @@
-# app/routes.py
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify,current_app
-from .extensions import db
-from .models import User, Message,PropertyListing, Photos, Reservation, Review
+from flask import (
+    Blueprint, render_template, request, redirect, url_for,
+    flash, jsonify, current_app, send_from_directory
+)
+from flask_login import login_user, login_required, current_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from flask_login import login_user, login_required, current_user, logout_user
-from flask import jsonify,send_from_directory
-from sqlalchemy import func, case
+from .extensions import db
+from .models import User, Message, PropertyListing, Photos, Reservation, Review
+from sqlalchemy.exc import IntegrityError
 import os
 from datetime import datetime, timedelta
-from sqlalchemy.exc import IntegrityError
 
 
 
@@ -216,37 +216,67 @@ def create_property_listing():
 @login_required
 def delete_property(property_id):
     if not current_user.is_admin:
+        flash('Unauthorized access.', 'danger')
         return jsonify({'error': 'Unauthorized'}), 403
 
     property_to_delete = PropertyListing.query.get_or_404(property_id)
-    
+    db.session.delete(property_to_delete)
     Photos.query.filter_by(property_id=property_id).delete()
 
-    db.session.delete(property_to_delete)
     try:
         db.session.commit()
+        flash('Property deleted successfully.', 'success')
         return jsonify({'message': 'Property deleted successfully'})
     except Exception as e:
         db.session.rollback()
+        flash('Failed to delete property.', 'danger')
         return jsonify({'error': str(e)}), 500
+
     
     
 
 
     
 ######################################################################## for updating property listing
+# Route to handle property updates
 @main_bp.route('/update_property/<int:property_id>', methods=['POST'])
 @login_required
 def update_property(property_id):
     if not current_user.is_admin:
+        flash('Unauthorized access.', 'error')
         return jsonify({'error': 'Unauthorized'}), 403
 
     property_to_update = PropertyListing.query.get_or_404(property_id)
-    property_to_update.title = request.form.get('title')
-    # update other fields as necessary
-    db.session.commit()
-    
-    flash('Property updated successfully.')
+    property_to_update.title = request.form['title']
+    property_to_update.description = request.form['description']
+    property_to_update.bedrooms = int(request.form['bedrooms'])
+    property_to_update.bathrooms = int(request.form['bathrooms'])
+    property_to_update.price = int(request.form['price'])
+    property_to_update.location = request.form['location']
+
+    # Handle photo uploads
+    photos_to_add = request.files.getlist('photos')
+    if photos_to_add and photos_to_add[0].filename:  # Check if at least one photo has a filename
+        # Delete old photos if new ones are provided
+        Photos.query.filter_by(property_id=property_id).delete()
+
+        for photo in photos_to_add:
+            if photo and allowed_file(photo.filename):
+                filename = secure_filename(photo.filename)
+                photo_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+                photo.save(photo_path)
+                new_photo = Photos(photo=filename, property_id=property_id)
+                db.session.add(new_photo)
+            else:
+                flash('Invalid file format. Allowed formats are png, jpg, jpeg.', 'error')
+
+    try:
+        db.session.commit()
+        flash('Property updated successfully.')
+    except Exception as e:
+        db.session.rollback()
+        flash('Failed to update property: {}'.format(e), 'error')
+
     return redirect(url_for('main.edit_property', property_id=property_id))
 
     
@@ -440,22 +470,28 @@ def add_review():
     db.session.add(review)
     db.session.commit()
     
-    return redirect(url_for('main.property_detail', property_id=property_id))
+    return redirect(url_for('main.an_uploaded_file', property_id=property_id))
 
 
-#################################################################### f
-
+####################################################################
+# Route to display detailed view of a specific property
+# This route fetches a property by its ID, retrieves the associated photos,
+# constructs URLs for those photos using a named endpoint that serves files directly,
+# and then renders a template to display the property details including its images.
 @main_bp.route('/property/<int:property_id>')
 def property_detail(property_id):
-    property_listing = PropertyListing.query.get_or_404(property_id)  # Correctly assign to property_listing
-    photo_urls = [url_for('static', filename=photo.photo) for photo in property_listing.photos]
+    property_listing = PropertyListing.query.get_or_404(property_id)
+    photo_urls = [url_for('main.an_uploaded_file', filename=photo.photo) for photo in property_listing.photos]
     return render_template('property.html', property=property_listing, photo_urls=photo_urls)
 
 
 
-
-#################################################################### renders each file when called 
-
+####################################################################
+# Route to render the edit page for a specific property
+# This route is protected by login and further, it checks if the logged-in user is an admin.
+# Only admins are allowed to edit properties. If an unauthorized access is attempted,
+# a JSON error message is returned. If authorized, it fetches the property by ID and
+# displays an edit form pre-filled with the property's existing details.
 @main_bp.route('/edit_property/<int:property_id>')
 @login_required
 def edit_property(property_id):
@@ -465,6 +501,12 @@ def edit_property(property_id):
     property_to_edit = PropertyListing.query.get_or_404(property_id)
     return render_template('edit_property.html', property=property_to_edit)
 
+
+
+
+@main_bp.route('/uploads/<filename>')
+def an_uploaded_file(filename):
+    return send_from_directory(current_app.config['UPLOAD_FOLDER'], filename)
 
 
 

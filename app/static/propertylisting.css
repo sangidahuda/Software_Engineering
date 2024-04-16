@@ -157,3 +157,22 @@ body {
   padding-top: 5px;
   padding-bottom: 1px;
 }
+
+/* ******************************* */
+.swiper-container {
+  width: 40%;
+  height: 400px; /* Adjusted height */
+  position: relative;
+}
+.swiper-slide img {
+  width: 80%;
+  height: auto; /* This will cover the slide's dimensions */
+  object-fit: cover; /* This will cover the area without losing the aspect ratio */
+}
+.swiper-button-prev, .swiper-button-next {
+  z-index: 10; /* Ensures buttons are above the images */
+  color: #c02121; /* Better visibility */
+}
+.swiper-pagination-bullet {
+  background-color: #fff; /* Better visibility */
+}
