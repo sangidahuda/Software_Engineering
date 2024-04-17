@@ -219,17 +219,28 @@ def delete_property(property_id):
         flash('Unauthorized access.', 'danger')
         return jsonify({'error': 'Unauthorized'}), 403
 
-    property_to_delete = PropertyListing.query.get_or_404(property_id)
-    db.session.delete(property_to_delete)
-    Photos.query.filter_by(property_id=property_id).delete()
-
     try:
+        # Delete related photos
+        Photos.query.filter_by(property_id=property_id).delete()
+        
+        # Delete related reservations
+        Reservation.query.filter_by(property_id=property_id).delete()
+
+        # Delete related reviews
+        Review.query.filter_by(property_id=property_id).delete()
+
+        # Then delete the property listing
+        property_to_delete = PropertyListing.query.get_or_404(property_id)
+        db.session.delete(property_to_delete)
+
+        # Commit the transaction
         db.session.commit()
-        flash('Property deleted successfully.', 'success')
-        return jsonify({'message': 'Property deleted successfully'})
+        flash('Property and all related data deleted successfully.', 'success')
+        return jsonify({'message': 'Property and all related data deleted successfully'})
     except Exception as e:
+        # Rollback the transaction in case of error
         db.session.rollback()
-        flash('Failed to delete property.', 'danger')
+        flash('Failed to delete property and related data.', 'danger')
         return jsonify({'error': str(e)}), 500
 
     
