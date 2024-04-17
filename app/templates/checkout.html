@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Checkout</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='checkout.css') }}">
+</head>
+<body>
+
+  <div class="navbar">
+    <a href="{{ url_for('main.index') }}">Home</a>
+    <a href="{{ url_for('main.aboutus') }}">About</a> 
+    <a href="{{ url_for('main.user_dashboard') }}">My Dashboard</a>
+    <a href="{{ url_for('main.user_messages') }}">Message Us</a>
+    <a href="{{ url_for('main.login') }}">Login</a>
+  </div>
+  
+  <div class="container">
+    <h2>Booking Summary</h2>
+    <div class="booking-details">
+      <h3>{{ property.title }}</h3>
+      <p><strong>Location:</strong> {{ property.location }}</p>
+      <p><strong>Check-in:</strong> {{ reservation.start_date.strftime('%Y-%m-%d') }}</p>
+      <p><strong>Check-out:</strong> {{ reservation.end_date.strftime('%Y-%m-%d') }}</p>
+      <p><strong>Total Cost:</strong> ${{ reservation.total }}</p>
+    </div>
+
+    <div class="payment-methods">
+        <h3>Select Payment Method</h3>
+        <label for="credit-card">
+          <input type="radio" id="credit-card" name="payment-method" value="credit-card" checked>
+          Credit Card
+        </label>
+        <label for="paypal">
+          <input type="radio" id="paypal" name="payment-method" value="paypal">
+          PayPal
+        </label>
+      </div>
+    
+    <form action="{{ url_for('main.confirm_reservation', reservation_id=reservation.id) }}" method="post">
+      <button type="submit" class="confirm-btn">Confirm Booking</button>
+    </form>
+  </div>
+
+</body>
+</html>

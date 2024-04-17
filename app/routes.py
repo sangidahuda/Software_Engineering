@@ -17,7 +17,7 @@ main_bp = Blueprint('main', __name__)
 
 
 
-@main_bp.route('/', methods=['GET', 'POST'])
+@main_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         name = request.form.get('name')
@@ -366,6 +366,9 @@ def create_reservation(property_id):
         if discount > 0:
             flash_message += f' (including a {discount*100}% discount for booking 6 months in advance.)'
         flash(flash_message)
+
+        return redirect(url_for('main.checkout', reservation_id=new_reservation.id))
+
     except IntegrityError:
         db.session.rollback()
         flash('An error occurred. Please try again.')
@@ -510,7 +513,7 @@ def an_uploaded_file(filename):
 
 
 
-@main_bp.route('/index')
+@main_bp.route('/')
 def index():
     return render_template('index.html')
 
@@ -534,3 +537,29 @@ def admin_dashboard():
 def aboutus():
     return render_template('aboutus.html')
 
+#########################################################################
+
+@main_bp.route('/checkout/<int:reservation_id>')
+@login_required
+def checkout(reservation_id):
+    reservation = Reservation.query.get_or_404(reservation_id)
+    if reservation.user_id != current_user.id:
+        flash('You do not have permission to access this reservation.', 'warning')
+        return redirect(url_for('main.index'))
+
+    property_listing = PropertyListing.query.get_or_404(reservation.property_id)
+    return render_template('checkout.html', reservation=reservation, property=property_listing)
+
+@main_bp.route('/confirm_reservation/<int:reservation_id>', methods=['POST'])
+@login_required
+def confirm_reservation(reservation_id):
+    reservation = Reservation.query.get_or_404(reservation_id)
+    if reservation.user_id != current_user.id:
+        flash('You do not have permission to confirm this reservation.', 'warning')
+        return redirect(url_for('main.index'))
+
+    reservation.status = 'confirmed'
+    db.session.commit()
+    
+    flash('Your reservation has been confirmed!', 'success')
+    return redirect(url_for('main.user_dashboard'))
