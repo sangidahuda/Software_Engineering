@@ -473,8 +473,9 @@ def add_review():
     db.session.add(review)
     db.session.commit()
     
-    return redirect(url_for('main.an_uploaded_file', property_id=property_id))
-
+    # Redirect to the property details page, assuming it is named 'property_detail'
+    return redirect(url_for('main.property_detail', property_id=property_id))
+    
 
 ####################################################################
 # Route to display detailed view of a specific property
@@ -484,6 +485,7 @@ def add_review():
 @main_bp.route('/property/<int:property_id>')
 def property_detail(property_id):
     property_listing = PropertyListing.query.get_or_404(property_id)
+    # Make sure to use the correct function name in your url_for
     photo_urls = [url_for('main.an_uploaded_file', filename=photo.photo) for photo in property_listing.photos]
     return render_template('property.html', property=property_listing, photo_urls=photo_urls)
 
@@ -503,6 +505,11 @@ def edit_property(property_id):
 
     property_to_edit = PropertyListing.query.get_or_404(property_id)
     return render_template('edit_property.html', property=property_to_edit)
+
+
+
+
+
 
 
 
