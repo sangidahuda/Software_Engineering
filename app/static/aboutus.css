@@ -64,3 +64,13 @@ a {
 a:hover {
   text-decoration: underline;
 }
+
+.logo-container {
+  text-align: center;
+}
+
+.logo {
+  max-width: 100%;
+  height: auto;
+  margin-top: 20px;
+}
