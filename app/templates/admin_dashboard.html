@@ -10,134 +10,174 @@
   <div class="navbar">
     <a href="{{ url_for('main.index') }}">Home</a>
     <a href="{{ url_for('main.aboutus') }}">About</a> 
-    <a href="{{ url_for('main.user_dashboard') }}">my dash</a>
-    <a href="{{ url_for('main.user_messages') }}">message us</a>
-  </div>
-  <div class="header">
-    <h2>Admin Dashboard</h2>
+    <a href="{{ url_for('main.user_dashboard') }}">My Dashboard</a>
+    <a href="{{ url_for('main.user_messages') }}">Message Us</a>
     <a href="{{ url_for('main.logout') }}" class="logout-button">Logout</a>
   </div>
   
+  <div class="header">
+    <h2>Admin Dashboard</h2>
+  </div>
+
   <div id="inbox-container">
     <h3>Messages</h3>
     <ul id="userList">
+      <!-- Messages will be dynamically loaded here -->
     </ul>
   </div>
 
   <div id="property-container">
     <h3>Properties</h3>
     <div id="propertyList">
-      <!-- Property items will be added here by the script (js code) -->
+      <!-- Property items will be dynamically added here -->
     </div>
-    
-  </div>
-
-
-  <div id="propertyList">
-    <form
-      action="{{ url_for('main.create_property_listing') }}"
-      method="post"
-      enctype="multipart/form-data"
-    >
+    <form action="{{ url_for('main.create_property_listing') }}" method="post" enctype="multipart/form-data">
       <input type="text" name="title" placeholder="Name" required /><br />
       <input type="text" name="description" placeholder="Description" required /><br />
       <input type="number" name="bedrooms" placeholder="Bedrooms" required /><br />
       <input type="number" name="bathrooms" placeholder="Bathrooms" required /><br />
       <input type="number" name="price" placeholder="Price" required /><br />
       <input type="text" name="location" placeholder="Location" required /><br />
-      <input type="file" name="images" accept="image/jpeg, image/png" multiple required/><br />
+      <input type="file" name="images" accept="image/*" multiple required /><br />
       <button type="submit">Create Listing</button>
     </form>
   </div>
 
+  <div id="reservations-container">
+    <h3>Current Reservations</h3>
+    <div id="reservationList">
+      <!-- Reservations will be dynamically added here -->
+    </div>
+  </div>
+
   <script>
     $(document).ready(function () {
+      // Function to fetch user list
       function fetchUserList() {
         $.ajax({
           url: "{{ url_for('main.get_user_list') }}",
           type: "GET",
           success: function (response) {
             var userList = $("#userList");
-            userList.empty(); 
+            userList.empty();
             response.user_list.forEach(function (user) {
-              var listItem = $("<li>").text(user.name);
-              listItem.on("click", function () {
-                // Redirects to user-specific conversation page
-                window.location.href = "/admin_messages/" + user.sender_id;
+              var listItem = $("<li>").addClass('user-item');
+              var nameDiv = $("<div>").text(user.name).addClass('user-name');
+              var respondButton = $("<button>").text("Respond").addClass('respond-btn').on("click", function () {
+                window.location.href = "/admin_messages/" + user.sender_id; 
               });
+  
+              var deleteButton = $("<button>").text("Delete").addClass('delete-btn').on("click", function () {
+                var confirmDeletion = confirm("Are you sure you want to delete this user's messages?");
+                if (confirmDeletion) {
+                  $.ajax({
+                    url: "{{ url_for('main.delete_user_messages') }}", 
+                    type: "POST",
+                    data: JSON.stringify({ sender_id: user.sender_id }), 
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function(response) {
+                      if(response.success) {
+                        listItem.remove(); 
+                        alert('Messages deleted successfully.');
+                      } else {
+                        alert('Failed to delete messages: ' + response.error);
+                      }
+                    },
+                    error: function(xhr) {
+                      alert("Error deleting messages: " + xhr.responseText);
+                    }
+                  });
+                }
+              });
+  
+              listItem.append(nameDiv).append(respondButton).append(deleteButton);
               userList.append(listItem);
             });
           },
           error: function (error) {
-            console.log("Error fetching user list:", error);
-          },
+            console.error("Error fetching user list: ", error);
+          }
         });
       }
 
-      fetchUserList();
-    });
-  </script>
-
-  <!-- this is for viewing the property listings -->
-  <script>
-    $(document).ready(function() {
-        // Fetch property listings on page load
-        fetchPropertyListings();
+      // Function to fetch property listings
+      function fetchPropertyListings() {
+        $.ajax({
+          url: "{{ url_for('main.get_property_listings') }}",
+          type: "GET",
+          success: function(response) {
+            var propertyList = $("#propertyList");
+            propertyList.empty();
     
-        function fetchPropertyListings() {
-            $.ajax({
-                url: "{{ url_for('main.get_property_listings') }}",
-                type: "GET",
-                success: function(response) {
-                    var propertyList = $("#propertyList");
-                    propertyList.empty(); 
+            response.forEach(function(property) {
+              var listing = $('<div class="property-item">');
+              listing.append($('<img>').attr('src', property.first_photo_url).css({ maxWidth: '100px', maxHeight: '100px' }));
+              listing.append($('<div>').text(property.title + " - " + property.location + " - $" + property.price));
+              listing.append($('<div>').text("Bedrooms: " + property.bedrooms + ", Bathrooms: " + property.bathrooms));
     
-                    response.forEach(function(property) {
-                        var listing = $('<div class="property-item">');
-                        listing.append($('<img>').attr('src', property.first_photo_url).css({ maxWidth: '100px', maxHeight: '100px' }));
-                        listing.append($('<div>').text(property.title + " - " + property.location + " - $" + property.price));
-                        listing.append($('<div>').text("Bedrooms: " + property.bedrooms + ", Bathrooms: " + property.bathrooms));
+              var editButton = $('<button>').text('Edit').on('click', function() {
+                window.location.href = "/edit_property/" + property.id; 
+              });
     
-                        // Edit button
-                        var editButton = $('<button>').text('Edit').on('click', function() {
-                            window.location.href = "/edit_property/" + property.id; 
-                        });
-    
-                        // Delete button
-                        var deleteButton = $('<button>').text('Delete').on('click', function() {
-                            if (confirm('Are you sure you want to delete this property?')) {
-                                deleteProperty(property.id);
-                            }
-                        });
-    
-                        listing.append(editButton, deleteButton); 
-                        propertyList.append(listing); 
-                    });
-                },
-                error: function(error) {
-                    console.error("Error fetching property listings:", error);
+              var deleteButton = $('<button>').text('Delete').on('click', function() {
+                if (confirm('Are you sure you want to delete this property?')) {
+                  deleteProperty(property.id);
                 }
-            });
-        }
+              });
     
-        function deleteProperty(propertyId) {
-          $.ajax({
-          url: "/delete_property/" + propertyId,  // Corrected URL to match Flask route
+              listing.append(editButton, deleteButton); 
+              propertyList.append(listing); 
+            });
+          },
+          error: function(error) {
+            console.error("Error fetching property listings:", error);
+          }
+        });
+      }
+
+      function deleteProperty(propertyId) {
+        $.ajax({
+          url: "/delete_property/" + propertyId, 
           type: "POST",
           success: function(response) {
-             alert('Property deleted successfully: ' + response.message); // Show success message
-              fetchPropertyListings();  // Refresh the property list
+             alert('Property deleted successfully: ' + response.message); 
+              fetchPropertyListings();  
           },
          error: function(xhr, status, error) {
-             alert('Failed to delete property: ' + xhr.responseText); // Show error message
+             alert('Failed to delete property: ' + xhr.responseText); 
           }
-    });
-}
-    });
-    </script>
-    
-  
+        });
+      }
 
+      // Function to fetch reservations
+      function fetchReservations() {
+        $.ajax({
+          url: "{{ url_for('main.get_reservations') }}",
+          type: "GET",
+          success: function (reservations) {
+            var reservationList = $("#reservationList");
+            reservationList.empty();
+            reservations.forEach(function (reservation) {
+              var reservationDiv = $('<div class="reservation-item">');
+              reservationDiv.append($('<h4>').text(reservation.property_title));
+              reservationDiv.append($('<p>').text('Reserved by: ' + reservation.customer_name));
+              reservationDiv.append($('<p>').text('From: ' + reservation.start_date + ' To: ' + reservation.end_date));
+              reservationDiv.append($('<p>').text('Total: $' + reservation.total));
+              reservationList.append(reservationDiv);
+            });
+          },
+          error: function (error) {
+            console.error("Error fetching reservations:", error);
+          }
+        });
+      }
 
-</body
+      // Initial fetch calls
+      fetchUserList();
+      fetchPropertyListings();
+      fetchReservations();
+    });
+  </script>
+</body>
 </html>

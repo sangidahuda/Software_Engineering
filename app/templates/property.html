@@ -15,6 +15,17 @@
         <a href="{{ url_for('main.login') }}">Login</a>
     </div>
 
+    <!-- Flash messages display area --> 
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div id="flash-messages">
+                {% for message in messages %}
+                    <div class="alert">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
     <div class="swiper-container">
         <div class="swiper-wrapper">
             {% for photo_url in photo_urls %}

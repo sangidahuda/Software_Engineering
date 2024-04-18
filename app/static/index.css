@@ -164,9 +164,9 @@ a[href*="login"]:hover {
     background-color: #075fbd;
     padding: 0 20px;
     margin-bottom: 60px;
-  }
-  
-  .navbar a {
+}
+
+.navbar a {
     float: left;
     display: block;
     color: #f2f2f2;
@@ -174,15 +174,77 @@ a[href*="login"]:hover {
     padding: 14px 20px;
     text-decoration: none;
     transition: 0.4s;
-  }
-  
-  .navbar a:hover {
+}
+
+.navbar a:hover {
     background-color: #ddd;
     color: black;
-  }
-  
-  .navbar a.active {
+}
+
+.navbar a.active {
     background-color: #466b93;
     color: white;
-  }
-  
+}
+/* Footer */
+.footer {
+    background-color: #1855e2;
+    color: #fff;
+    padding: 40px 0;
+}
+
+.footer .container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.footer .footer-content {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.footer-section {
+    flex: 1;
+    margin-right: 30px;
+}
+
+.footer-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-section ul li {
+    margin-bottom: 10px;
+}
+
+.footer-section h3 {
+    border-bottom: 2px solid #fff;
+    padding-bottom: 10px;
+}
+
+/* Add the new grid layout */
+#propertyList {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 properties per row */
+    grid-gap: 20px; /* Spacing between items */
+    padding: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    #propertyList {
+        grid-template-columns: repeat(3, 1fr); /* 3 properties per row */
+    }
+}
+
+@media (max-width: 992px) {
+    #propertyList {
+        grid-template-columns: repeat(2, 1fr); /* 2 properties per row */
+    }
+}
+
+@media (max-width: 768px) {
+    #propertyList {
+        grid-template-columns: 1fr; /* 1 property per row */
+    }
+}

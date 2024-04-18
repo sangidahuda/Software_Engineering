@@ -8,7 +8,43 @@ body {
 h2 {
     color: #3b5998; 
 }
+/* Header and Navbar Styles */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #007bff;
+    color: #fff;
+    padding: 15px 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
 
+h2 {
+    margin: 0;
+    font-size: 24px;
+      color: #3b5998; /* Adjusted for consistency */
+}
+
+.navbar {
+    display: flex;
+    justify-content: flex-start;
+    background-color: #075fbd;
+    padding: 0 20px;
+}
+
+.navbar a {
+    display: block;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    transition: background 0.3s, color 0.3s;
+}
+
+.navbar a:hover, .navbar a.active {
+    background-color: #00448a;
+    color: white;
+}
 form {
     background-color: white;
     padding: 20px;

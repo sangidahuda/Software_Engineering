@@ -17,6 +17,7 @@ def create_app():
    app.config['UPLOAD_FOLDER'] = '/Users/jorgegonzales/Desktop/WebsiteImages'   
 
 
+
    db.init_app(app)
    login_manager.init_app(app)
    from .models import User 
