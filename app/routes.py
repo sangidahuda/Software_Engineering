@@ -55,7 +55,7 @@ def login():
             login_user(user)
             if user.is_admin:
                 return redirect(url_for('main.admin_dashboard'))
-            else:  # This else should align with if user.is_admin
+            else:  
                 return redirect(url_for('main.index'))
         else:
             flash('Invalid email or password.')  
@@ -255,45 +255,41 @@ def delete_property(property_id):
     
     
 ######################################################################## for updating property listing
-# Route to handle property updates
 @main_bp.route('/update_property/<int:property_id>', methods=['POST'])
 @login_required
 def update_property(property_id):
     if not current_user.is_admin:
         flash('Unauthorized access.', 'error')
-        return jsonify({'error': 'Unauthorized'}), 403
+        return redirect(url_for('main.index'))  # Redirecting to the home if not admin
 
     property_to_update = PropertyListing.query.get_or_404(property_id)
-    property_to_update.title = request.form['title']
-    property_to_update.description = request.form['description']
-    property_to_update.bedrooms = int(request.form['bedrooms'])
-    property_to_update.bathrooms = int(request.form['bathrooms'])
-    property_to_update.price = int(request.form['price'])
-    property_to_update.location = request.form['location']
-
-    photos_to_add = request.files.getlist('photos')
-    if photos_to_add and photos_to_add[0].filename:  
-        # Delete old photos if new ones are provided
-        Photos.query.filter_by(property_id=property_id).delete()
-
-        for photo in photos_to_add:
-            if photo and allowed_file(photo.filename):
-                filename = secure_filename(photo.filename)
-                photo_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-                photo.save(photo_path)
-                new_photo = Photos(photo=filename, property_id=property_id)
-                db.session.add(new_photo)
-            else:
-                flash('Invalid file format. Allowed formats are png, jpg, jpeg.', 'error')
-
     try:
+        property_to_update.title = request.form['title']
+        property_to_update.description = request.form['description']
+        property_to_update.bedrooms = int(request.form['bedrooms'])
+        property_to_update.bathrooms = int(request.form['bathrooms'])
+        property_to_update.price = int(request.form['price'])
+        property_to_update.location = request.form['location']
+
+        # Updating photos if any new ones are provided
+        photos_to_add = request.files.getlist('photos')
+        if photos_to_add and photos_to_add[0].filename:  # Check if at least one photo has a filename
+            Photos.query.filter_by(property_id=property_id).delete()  # Delete old photos
+            for photo in photos_to_add:
+                if allowed_file(photo.filename):
+                    filename = secure_filename(photo.filename)
+                    photo_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+                    photo.save(photo_path)
+                    new_photo = Photos(photo=filename, property_id=property_id)
+                    db.session.add(new_photo)
+
         db.session.commit()
         flash('Property updated successfully.')
+        return redirect(url_for('main.admin_dashboard')) 
     except Exception as e:
         db.session.rollback()
-        flash('Failed to update property: {}'.format(e), 'error')
-
-    return redirect(url_for('main.edit_property', property_id=property_id))
+        flash(f'Failed to update property: {str(e)}', 'error')
+        return redirect(url_for('main.edit_property', property_id=property_id))
 
     
 ################################################################## for loging out admin from the dashboard
@@ -349,11 +345,21 @@ def create_reservation(property_id):
         flash('Cannot select dates in the past.')
         return redirect(url_for('main.property_detail', property_id=property_id))
     
+    # Check for overlapping reservations
+    existing_reservations = Reservation.query.filter(
+        Reservation.property_id == property_id,
+        Reservation.end_date >= start_date,
+        Reservation.start_date <= end_date
+    ).all()
+
+    if existing_reservations:
+        flash(f'Unable to reserve from {start_date.strftime("%Y-%m-%d")} to {end_date.strftime("%Y-%m-%d")}. These dates are already booked. Please choose different dates.')
+        return redirect(url_for('main.property_detail', property_id=property_id))
+
     # Calculate the number of days of the reservation
     delta = end_date - start_date
     reservation_days = delta.days + 1  
 
-    # gets the property to calculate the total cost
     property = PropertyListing.query.get_or_404(property_id)
     base_price = property.price
 
@@ -363,7 +369,6 @@ def create_reservation(property_id):
         discount = 0.1  # 10% discount for bookings made at least 6 months in advance
 
     total_price_before_discount = base_price * reservation_days
-
     discounted_total_price = total_price_before_discount - (total_price_before_discount * discount)
 
     new_reservation = Reservation(
@@ -520,8 +525,6 @@ def edit_property(property_id):
 
     property_to_edit = PropertyListing.query.get_or_404(property_id)
     return render_template('edit_property.html', property=property_to_edit)
-
-####################################################################
 
 
 @main_bp.route('/uploads/<filename>')
