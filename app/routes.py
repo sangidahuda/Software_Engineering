@@ -119,7 +119,6 @@ def get_user_list():
     return jsonify({'user_list': user_list})
 
 #################################################################### for viewing client messages
-
 @main_bp.route('/admin_messages/<int:user_id>')
 @login_required
 def admin_messages(user_id):
@@ -133,6 +132,22 @@ def admin_messages(user_id):
     ).order_by(Message.timestamp.asc()).all()
 
     return render_template('admin_messages.html', user=user, messages=messages)
+#################################################################### for deleting client messages
+@main_bp.route('/delete_user_messages', methods=['POST'])
+@login_required
+def delete_user_messages():
+    if not current_user.is_admin:
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+
+    sender_id = request.json.get('sender_id')
+    try:
+       
+        Message.query.filter_by(sender_id=sender_id).delete()
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 #################################################################### for sending client messages
 #owner messages client
@@ -219,23 +234,25 @@ def delete_property(property_id):
         flash('Unauthorized access.', 'danger')
         return jsonify({'error': 'Unauthorized'}), 403
 
-    property_to_delete = PropertyListing.query.get_or_404(property_id)
-    db.session.delete(property_to_delete)
-    Photos.query.filter_by(property_id=property_id).delete()
-
     try:
+        # First delete all related data
+        Photos.query.filter_by(property_id=property_id).delete()
+        Reservation.query.filter_by(property_id=property_id).delete()
+        Review.query.filter_by(property_id=property_id).delete()
+
+        # Then delete the property listing
+        property_to_delete = PropertyListing.query.get_or_404(property_id)
+        db.session.delete(property_to_delete)
+
         db.session.commit()
-        flash('Property deleted successfully.', 'success')
-        return jsonify({'message': 'Property deleted successfully'})
+        flash('Property and all related data deleted successfully.', 'success')
+        return jsonify({'message': 'Property and all related data deleted successfully'})
     except Exception as e:
         db.session.rollback()
-        flash('Failed to delete property.', 'danger')
+        flash('Failed to delete property and related data.', 'danger')
         return jsonify({'error': str(e)}), 500
 
     
-    
-
-
     
 ######################################################################## for updating property listing
 @main_bp.route('/update_property/<int:property_id>', methods=['POST'])
@@ -477,7 +494,6 @@ def add_review():
     db.session.add(review)
     db.session.commit()
     
-    # Redirect to the property details page, assuming it is named 'property_detail'
     return redirect(url_for('main.property_detail', property_id=property_id))
     
 
@@ -510,6 +526,7 @@ def edit_property(property_id):
     property_to_edit = PropertyListing.query.get_or_404(property_id)
     return render_template('edit_property.html', property=property_to_edit)
 
+
 @main_bp.route('/uploads/<filename>')
 def an_uploaded_file(filename):
     return send_from_directory(current_app.config['UPLOAD_FOLDER'], filename)
@@ -523,7 +540,6 @@ def index():
 @main_bp.route('/user_messages')
 @login_required
 def user_messages():
-    # Ensures only non-admin users can access this page
     if current_user.is_admin:
         return redirect(url_for('main.index'))  
     return render_template('user_messages.html')
@@ -531,7 +547,6 @@ def user_messages():
 @main_bp.route('/admin_dashboard')
 @login_required
 def admin_dashboard():
-    # Ensures only admin users can access this page
     if not current_user.is_admin:
         return redirect(url_for('main.index'))  
     return render_template('admin_dashboard.html')

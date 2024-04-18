@@ -60,28 +60,55 @@
             var userList = $("#userList");
             userList.empty(); 
             response.user_list.forEach(function (user) {
-              var listItem = $("<li>").text(user.name);
-              listItem.on("click", function () {
-                // Redirects to user-specific conversation page
-                window.location.href = "/admin_messages/" + user.sender_id;
+              var listItem = $("<li>").addClass('user-item');
+              var nameDiv = $("<div>").text(user.name).addClass('user-name');
+              var respondButton = $("<button>").text("Respond").addClass('respond-btn').on("click", function () {
+                window.location.href = "/admin_messages/" + user.sender_id; 
               });
+  
+              // Delete button logic
+              var deleteButton = $("<button>").text("Delete").addClass('delete-btn').on("click", function () {
+                var confirmDeletion = confirm("Are you sure you want to delete this user's messages?");
+                if (confirmDeletion) {
+                  $.ajax({
+                    url: "{{ url_for('main.delete_user_messages') }}", 
+                    type: "POST",
+                    data: JSON.stringify({ sender_id: user.sender_id }), 
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function(response) {
+                      if(response.success) {
+                        listItem.remove(); 
+                        alert('Messages deleted successfully.');
+                      } else {
+                        alert('Failed to delete messages: ' + response.error);
+                      }
+                    },
+                    error: function(xhr) {
+                      alert("Error deleting messages: " + xhr.responseText);
+                    }
+                  });
+                }
+              });
+  
+              listItem.append(nameDiv).append(respondButton).append(deleteButton);
               userList.append(listItem);
             });
           },
           error: function (error) {
-            console.log("Error fetching user list:", error);
-          },
+            console.error("Error fetching user list: ", error);
+          }
         });
       }
-
+  
       fetchUserList();
     });
   </script>
+  
 
   <!-- this is for viewing the property listings -->
   <script>
     $(document).ready(function() {
-        // Fetch property listings on page load
         fetchPropertyListings();
     
         function fetchPropertyListings() {
@@ -122,14 +149,14 @@
     
         function deleteProperty(propertyId) {
           $.ajax({
-          url: "/delete_property/" + propertyId,  // Corrected URL to match Flask route
+          url: "/delete_property/" + propertyId, 
           type: "POST",
           success: function(response) {
-             alert('Property deleted successfully: ' + response.message); // Show success message
-              fetchPropertyListings();  // Refresh the property list
+             alert('Property deleted successfully: ' + response.message); 
+              fetchPropertyListings();  
           },
          error: function(xhr, status, error) {
-             alert('Failed to delete property: ' + xhr.responseText); // Show error message
+             alert('Failed to delete property: ' + xhr.responseText); 
           }
     });
 }

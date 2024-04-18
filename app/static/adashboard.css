@@ -207,3 +207,49 @@ button.delete-button {
 .reservation-item:hover {
   box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
+/* ******************************************************* */
+#userList {
+  list-style-type: none;
+  padding: 0;
+  width: 100%;
+}
+
+.user-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #fff;
+  border-bottom: 1px solid #e1e1e1;
+  margin-bottom: 5px;
+}
+
+.user-name {
+  flex-grow: 1;
+  margin-right: 10px; 
+}
+
+.respond-btn, .delete-btn {
+  padding: 10px 15px;
+  border: none;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.respond-btn {
+  background-color: #4CAF50; 
+  color: white;
+}
+
+.delete-btn {
+  background-color: #f44336; 
+  color: white;
+}
+
+.respond-btn:hover {
+  background-color: #45a049;
+}
+
+.delete-btn:hover {
+  background-color: #d32f2f;
+}
