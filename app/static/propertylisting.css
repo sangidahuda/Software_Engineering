@@ -263,3 +263,19 @@ body {
   text-decoration: underline;
 }
 
+.alert {
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: black;
+  text-align: center;
+}
+
+.alert-error {
+  background-color: #f44336; /* Red for error messages */
+}
+
+.alert-success {
+  background-color: #4CAF50; /* Green for success messages */
+}
