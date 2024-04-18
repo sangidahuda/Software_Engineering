@@ -581,3 +581,27 @@ def confirm_reservation(reservation_id):
     
     flash('Your reservation has been confirmed!', 'success')
     return redirect(url_for('main.user_dashboard'))
+
+###############################################################################
+
+@main_bp.route('/get_reservations')
+@login_required
+def get_reservations():
+    if not current_user.is_admin:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    reservations = Reservation.query.all()
+    reservation_data = []
+    for reservation in reservations:
+        property = PropertyListing.query.get(reservation.property_id)
+        reservation_info = {
+            'reservation_id': reservation.id,
+            'property_title': property.title,
+            'customer_name': User.query.get(reservation.user_id).name,
+            'start_date': reservation.start_date.strftime('%Y-%m-%d'),
+            'end_date': reservation.end_date.strftime('%Y-%m-%d'),
+            'total': str(reservation.total)
+        }
+        reservation_data.append(reservation_info)
+
+    return jsonify(reservation_data)
